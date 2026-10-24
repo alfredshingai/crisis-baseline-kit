@@ -1,0 +1,20 @@
+# Build outputs are published as release artifacts, not committed
+baselines/
+
+# Raw data and caches
+*.tif
+*.zip
+cache/
+codab_extract/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db

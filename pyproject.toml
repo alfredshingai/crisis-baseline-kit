@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crisis-baseline-kit"
+version = "0.1.0"
+description = "Reproducible pre-crisis baseline maps and databases built from public data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Crisis Baseline Kit contributors" }]
+keywords = ["gis", "humanitarian", "baseline", "open-data", "preparedness"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dependencies = [
+    "geopandas>=1.0",
+    "rasterio>=1.3",
+    "shapely>=2.0",
+    "pyarrow>=15",
+    "exactextract>=0.2",
+    "pyyaml>=6",
+    "requests>=2.31",
+]
+
+[project.scripts]
+cbk = "cbk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

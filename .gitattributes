@@ -1,0 +1,2 @@
+# Normalize to LF in the repo; checkouts follow each platform's convention.
+* text=auto
