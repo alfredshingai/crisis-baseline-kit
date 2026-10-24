@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: >-
+  If you use Crisis Baseline Kit or its baseline data in your work,
+  please cite it. Baseline data should also credit its upstream sources
+  (WorldPop, OCHA COD-AB) as recorded in each bundle's manifest.json.
+title: Crisis Baseline Kit
+type: software
+authors:
+  - alias: alfredshingai
+repository-code: "https://github.com/alfredshingai/crisis-baseline-kit"
+url: "https://github.com/alfredshingai/crisis-baseline-kit/releases"
+abstract: >-
+  Reproducible pre-crisis baseline maps and databases built from public
+  data. One command builds a documented, quality-gated baseline for a
+  country: administrative boundaries with p-codes (OCHA COD-AB),
+  population rasters (WorldPop) and per-district zonal statistics,
+  packaged with full provenance (source URLs, licenses, versions,
+  checksums) and a bundled map viewer. Pilot country: Malawi.
+keywords:
+  - humanitarian
+  - GIS
+  - open-data
+  - disaster-response
+  - preparedness
+  - baseline
+license: MIT
