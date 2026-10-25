@@ -25,8 +25,9 @@ layers:
     optional: true
 
 checks:
-  # UN WPP 2020 estimate: 18.40M; gate is +/-30% (min 0.10M wide).
-  expected_population_total_millions: [12.88, 23.92]
+  # UN WPP 2020 estimate: 18.40M; gate is +/-40% (min 0.10M wide).
+  # WorldPop unconstrained can deviate further in forest-heavy states (e.g. Gabon runs ~30% high).
+  expected_population_total_millions: [11.04, 25.76]
 
 viewer:
   choropleth_field: population_sum

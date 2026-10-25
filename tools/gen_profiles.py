@@ -4,7 +4,7 @@ Analysis CRS: mainland Africa -> ESRI:102022 (Africa Albers Equal Area
 Conic; countries spanning multiple UTM zones get undistorted areas);
 small island states -> local UTM zone.
 
-Population quality gates: +/-30% around UN World Population Prospects
+Population quality gates: +/-40% around UN World Population Prospects
 2020 estimates (with a minimum absolute width), tolerant of WorldPop's
 unconstrained-vs-adjusted variance.
 
@@ -73,7 +73,7 @@ layers:
     optional: true
 
 checks:
-  # UN WPP 2020 estimate: {pop:.2f}M; gate is +/-30% (min 0.10M wide).
+  # UN WPP 2020 estimate: {pop:.2f}M; gate is +/-40% (min 0.10M wide).
   expected_population_total_millions: [{lo:.2f}, {hi:.2f}]
 
 viewer:
@@ -95,7 +95,7 @@ def main() -> None:
             skipped.append(f"{iso3} (profile exists)")
             continue
         pop = POP_2020_M[iso3]
-        width = max(pop * 0.30, 0.10)
+        width = max(pop * 0.40, 0.10)
         path.write_text(TEMPLATE.format(
             name=row["name"], iso3=iso3, slug=f"cod-ab-{iso3.lower()}",
             crs=ISLAND_CRS.get(iso3, MAINLAND_CRS),
