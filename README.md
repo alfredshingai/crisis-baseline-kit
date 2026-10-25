@@ -13,7 +13,7 @@
 
 *The bundled map viewer showing the Malawi baseline: population per
 admin-2 unit (WorldPop 2020) over OCHA COD-AB boundaries, with health
-facility counts per district. Try the [live map](https://alfredshingai.github.io/crisis-baseline-kit/).*
+facility counts per district. Try the [live map](https://alfredshingai.dev/crisis-baseline-kit/).*
 
 **Countries:** Malawi (MWI) · Mozambique (MOZ) — each one is a YAML profile.
 
@@ -104,7 +104,7 @@ country profile (YAML) ──► adapters ──► pipeline ──► dated bun
 
 - ~~health facilities~~ ✓ v0.2 — `facility_count` & `facilities_per_10k_pop`
   per district, from healthsites.io (ODbL, kept in a separate table)
-- ~~live map~~ ✓ v0.2 — [GitHub Pages site](https://alfredshingai.github.io/crisis-baseline-kit/),
+- ~~live map~~ ✓ v0.2 — [GitHub Pages site](https://alfredshingai.dev/crisis-baseline-kit/),
   auto-published from the weekly CI rebuild
 - next — roads & buildings (OSM), schools; PMTiles output; bundle diffing
   ("what changed since last month's baseline")
