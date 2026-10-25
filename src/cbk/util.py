@@ -39,8 +39,12 @@ def download(
     dest_dir: Path,
     session: requests.Session | None = None,
     timeout: tuple[int, int] = (20, 300),
+    attempts: int = 4,
 ) -> tuple[Path, str]:
     """Stream a file to dest_dir, computing its SHA-256 while writing.
+
+    Retries with backoff on connection errors — public data hosts
+    (HDX, WorldPop) drop connections under load.
 
     Returns (path, sha256).
     """
@@ -49,21 +53,52 @@ def download(
     dest = dest_dir / name
     own_session = session is None
     s = new_session() if own_session else session
+    last_exc: Exception | None = None
     try:
-        with s.get(url, stream=True, timeout=timeout, allow_redirects=True) as r:
-            r.raise_for_status()
-            h = hashlib.sha256()
-            done = 0
-            with open(dest, "wb") as f:
-                for chunk in r.iter_content(chunk_size=1 << 20):
-                    if chunk:
-                        f.write(chunk)
-                        h.update(chunk)
-                        done += len(chunk)
-                        if done % (50 << 20) < (1 << 20):
-                            log.info("... %s: %.0f MB downloaded", dest.name, done / 1e6)
+        for attempt in range(1, attempts + 1):
+            try:
+                with s.get(url, stream=True, timeout=timeout, allow_redirects=True) as r:
+                    r.raise_for_status()
+                    h = hashlib.sha256()
+                    done = 0
+                    with open(dest, "wb") as f:
+                        for chunk in r.iter_content(chunk_size=1 << 20):
+                            if chunk:
+                                f.write(chunk)
+                                h.update(chunk)
+                                done += len(chunk)
+                                if done % (50 << 20) < (1 << 20):
+                                    log.info("... %s: %.0f MB downloaded", dest.name, done / 1e6)
+                log.info("Downloaded %s (%.1f MB)", dest.name, dest.stat().st_size / 1e6)
+                return dest, h.hexdigest()
+            except (requests.ConnectionError, requests.Timeout) as exc:
+                last_exc = exc
+                if attempt < attempts:
+                    wait = attempt * 15
+                    log.warning("Download of %s failed (%s); retry %d/%d in %ds",
+                                name, exc.__class__.__name__, attempt, attempts - 1, wait)
+                    import time
+
+                    time.sleep(wait)
+        raise last_exc  # type: ignore[misc]
     finally:
         if own_session:
             s.close()
-    log.info("Downloaded %s (%.1f MB)", dest.name, dest.stat().st_size / 1e6)
-    return dest, h.hexdigest()
+
+
+def get_json(session: requests.Session, url: str, params: dict | None = None,
+             timeout: tuple[int, int] = (20, 60), attempts: int = 3) -> dict:
+    """GET a JSON API endpoint with retries; returns parsed JSON."""
+    last_exc: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            r = session.get(url, params=params, timeout=timeout)
+            r.raise_for_status()
+            return r.json()
+        except (requests.ConnectionError, requests.Timeout) as exc:
+            last_exc = exc
+            if attempt < attempts:
+                import time
+
+                time.sleep(attempt * 10)
+    raise last_exc  # type: ignore[misc]

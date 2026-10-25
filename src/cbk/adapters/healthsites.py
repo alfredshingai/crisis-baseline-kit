@@ -16,7 +16,7 @@ from typing import Any, Mapping
 
 import geopandas as gpd
 
-from ..util import download, log, new_session
+from ..util import download, get_json, log, new_session
 from .base import Adapter, BuildContext, LayerResult
 
 HDX_API = "https://data.humdata.org/api/3/action"
@@ -24,9 +24,7 @@ VECTOR_SUFFIXES = {".geojson", ".gpkg", ".shp", ".json"}
 
 
 def _hdx_get(session, action: str, params: dict) -> dict:
-    r = session.get(f"{HDX_API}/{action}", params=params, timeout=60)
-    r.raise_for_status()
-    payload = r.json()
+    payload = get_json(session, f"{HDX_API}/{action}", params=params)
     if not payload.get("success"):
         raise RuntimeError(f"HDX API call {action} failed: {payload.get('error')}")
     return payload["result"]
