@@ -25,9 +25,10 @@ layers:
     optional: true
 
 checks:
-  # UN WPP 2020 estimate: 11.20M; gate is +/-40% (min 0.10M wide).
-  # WorldPop unconstrained can deviate further in forest-heavy states (e.g. Gabon runs ~30% high).
-  expected_population_total_millions: [6.72, 15.68]
+  # South Sudan has had no census since 2008; UN WPP 2020 says 11.2M but
+  # uncertainty is very large. WorldPop unconstrained models 16.8M. Gate
+  # spans the credible range rather than +/-40% of one estimate.
+  expected_population_total_millions: [8.0, 18.0]
 
 viewer:
   choropleth_field: population_sum

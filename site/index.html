@@ -3,55 +3,189 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crisis Baseline Kit — live baselines</title>
+<title>Crisis Baseline Kit — Africa baselines</title>
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
-  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+  :root {
+    --bg: #f7f8fa; --panel: #ffffff; --line: #e3e6ea;
+    --ink: #1c2430; --muted: #5b6675; --accent: #0c5d8c; --accent-soft: #e8f2f8;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+         color: var(--ink); background: var(--bg); }
+  #app { display: grid; grid-template-rows: 56px 1fr; height: 100%; }
+
+  header { display: flex; align-items: center; gap: 14px; padding: 0 16px;
+           background: var(--panel); border-bottom: 1px solid var(--line);
+           z-index: 5; }
+  header .brand { font-weight: 700; font-size: 15px; letter-spacing: .2px; }
+  header .brand a { color: var(--ink); text-decoration: none; }
+  header .brand a:hover { color: var(--accent); }
+  header .sep { width: 1px; height: 22px; background: var(--line); }
+  header .country { font-size: 14px; color: var(--muted); }
+  header .country b { color: var(--ink); font-size: 15px; }
+  header .spacer { flex: 1; }
+  header .links { font-size: 12.5px; }
+  header .links a { color: var(--accent); text-decoration: none; margin-left: 14px; }
+  header .links a:hover { text-decoration: underline; }
+
+  main { display: grid; grid-template-columns: 264px 1fr; min-height: 0; }
+
+  aside { background: var(--panel); border-right: 1px solid var(--line);
+          display: flex; flex-direction: column; min-height: 0; }
+  aside .search { padding: 10px; border-bottom: 1px solid var(--line); }
+  aside input { width: 100%; padding: 8px 10px; border: 1px solid var(--line);
+                border-radius: 7px; font-size: 13px; background: var(--bg);
+                color: var(--ink); outline: none; }
+  aside input:focus { border-color: var(--accent); background: #fff; }
+  aside .list { overflow-y: auto; flex: 1; }
+  aside .item { display: flex; align-items: baseline; gap: 8px; width: 100%;
+                padding: 8px 12px; border: 0; background: none; cursor: pointer;
+                text-align: left; font-size: 13.5px; color: var(--ink); }
+  aside .item .iso { font-size: 11px; color: var(--muted); width: 30px; }
+  aside .item .pop { margin-left: auto; font-size: 11px; color: var(--muted); }
+  aside .item:hover { background: var(--accent-soft); }
+  aside .item.active { background: var(--accent); color: #fff; }
+  aside .item.active .iso, aside .item.active .pop { color: #dbeaf3; }
+  aside .count { padding: 8px 12px; font-size: 11px; color: var(--muted);
+                 border-top: 1px solid var(--line); }
+
+  #mapwrap { position: relative; min-height: 0; }
   #map { position: absolute; inset: 0; }
-  header { position: absolute; top: 0; left: 0; right: 0; z-index: 2;
-           padding: 10px 14px; background: rgba(255,255,255,.94);
-           border-bottom: 1px solid #ddd; }
-  header h1 { font-size: 16px; margin: 0; }
-  header p { font-size: 12px; margin: 3px 0 0; color: #555; }
-  header a { color: #08519c; }
-  #switcher { position: absolute; top: 64px; left: 14px; z-index: 2;
-              background: rgba(255,255,255,.94); border: 1px solid #ddd;
-              border-radius: 6px; overflow: hidden; }
-  #switcher button { display: block; width: 100%; border: 0; background: none;
-                     padding: 8px 14px; font-size: 13px; cursor: pointer;
-                     text-align: left; }
-  #switcher button.active { background: #08519c; color: #fff; font-weight: 600; }
-  #switcher button:not(.active):hover { background: #eff3ff; }
-  #legend { position: absolute; right: 10px; bottom: 10px; z-index: 2;
-            background: rgba(255,255,255,.94); border: 1px solid #ddd;
-            padding: 8px 10px; font-size: 12px; max-width: 240px; }
-  #attrib { position: absolute; left: 10px; bottom: 10px; z-index: 2;
-            background: rgba(255,255,255,.9); border: 1px solid #ddd;
-            padding: 5px 8px; font-size: 11px; max-width: 420px; color: #444; }
-  .swatch { display: inline-block; width: 12px; height: 12px;
-            margin-right: 6px; vertical-align: -1px; }
-  .maplibregl-popup td { padding: 2px 8px 2px 0; font-size: 12px; }
+
+  .card { position: absolute; background: rgba(255,255,255,.95);
+          border: 1px solid var(--line); border-radius: 9px;
+          box-shadow: 0 4px 14px rgba(20,30,45,.10); z-index: 4; }
+  #fields { top: 12px; left: 12px; display: flex; padding: 4px; gap: 4px; }
+  #fields button { border: 0; background: none; padding: 6px 12px; font-size: 12.5px;
+                   border-radius: 6px; cursor: pointer; color: var(--muted); }
+  #fields button.active { background: var(--accent); color: #fff; font-weight: 600; }
+  #fields button:not(.active):hover { background: var(--accent-soft); color: var(--accent); }
+
+  #legend { right: 12px; bottom: 26px; padding: 10px 12px; font-size: 12px; min-width: 170px; }
+  #legend b { display: block; margin-bottom: 6px; font-size: 12px; }
+  #legend .row { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+  #legend .swatch { width: 13px; height: 13px; border-radius: 3px; }
+  #legend .val { color: var(--ink); }
+
+  #attrib { position: absolute; left: 12px; bottom: 0; z-index: 4; font-size: 10.5px;
+            background: rgba(255,255,255,.9); padding: 3px 8px; border-radius: 6px 6px 0 0;
+            color: var(--muted); max-width: 55%; }
+  .maplibregl-popup-content { font-size: 12.5px; padding: 10px 12px; }
+  .maplibregl-popup table td { padding: 2px 10px 2px 0; }
+  .maplibregl-popup td.k { color: var(--muted); }
+
+  @media (max-width: 760px) {
+    main { grid-template-columns: 1fr; }
+    aside { display: none; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1 id="title">Crisis Baseline Kit</h1>
-  <p id="subtitle">Loading baselines…</p>
-</header>
-<div id="switcher"></div>
-<div id="map"></div>
-<div id="legend"><b id="legend-title"></b><div id="legend-rows"></div></div>
-<div id="attrib"></div>
+<div id="app">
+  <header>
+    <div class="brand"><a href="https://github.com/alfredshingai/crisis-baseline-kit">Crisis Baseline Kit</a></div>
+    <div class="sep"></div>
+    <div class="country" id="country-line">Loading…</div>
+    <div class="spacer"></div>
+    <div class="links">
+      <a href="https://github.com/alfredshingai/crisis-baseline-kit">Code &amp; data</a>
+      <a href="https://github.com/alfredshingai/crisis-baseline-kit/releases">Downloads</a>
+    </div>
+  </header>
+  <main>
+    <aside>
+      <div class="search"><input id="q" type="search" placeholder="Search country…" autocomplete="off"></div>
+      <div class="list" id="list"></div>
+      <div class="count" id="count"></div>
+    </aside>
+    <div id="mapwrap">
+      <div id="map"></div>
+      <div class="card" id="fields"></div>
+      <div class="card" id="legend"><b id="legend-title"></b><div id="legend-rows"></div></div>
+      <div id="attrib"></div>
+    </div>
+  </main>
+</div>
 <script>
-const fmt = n => (n == null || Number.isNaN(Number(n))) ? "-" :
-  Number(n).toLocaleString(undefined, {maximumFractionDigits: 0});
-let map, currentLayerIds = [];
+const COLORS = ["#edf8fb","#ccece6","#a8ddb5","#7bccc4","#4eb3d3","#2b8cbe","#08589e"];
+const FIELDS = [
+  { key: "population_sum",     label: "Population",        fmt: v => fmt(v) },
+  { key: "pop_density_km2",    label: "Density /km²",      fmt: v => fmt(v) },
+  { key: "facilities_per_10k_pop", label: "Facilities /10k", fmt: v => fmt(v, 1) },
+];
+const fmt = (n, d = 0) => (n == null || Number.isNaN(Number(n))) ? "–" :
+  Number(n).toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
 
-function clearLayers() {
-  for (const id of currentLayerIds) { if (map.getLayer(id)) map.removeLayer(id); }
-  for (const id of currentLayerIds) { if (map.getSource(id)) map.removeSource(id); }
-  currentLayerIds = [];
+let map, countries = [], current = null, field = FIELDS[0], hovered = [];
+
+function quantileBreaks(values, n = 7) {
+  const v = values.filter(x => x != null && !Number.isNaN(x)).sort((a, b) => a - b);
+  if (!v.length) return [];
+  const breaks = [];
+  for (let i = 1; i < n; i++) {
+    const b = v[Math.floor((i / n) * v.length)];
+    if (!breaks.length || b > breaks[breaks.length - 1]) breaks.push(b);
+  }
+  return breaks;
+}
+
+function fieldValues(geojson, key) {
+  return geojson.features.map(f => f.properties[key]);
+}
+
+function paintFor(geojson, fld) {
+  const b = quantileBreaks(fieldValues(geojson, fld.key));
+  if (!b.length) return COLORS[COLORS.length - 1];
+  const steps = [];
+  for (let i = 0; i < COLORS.length; i++) {
+    steps.push(COLORS[i]);
+    if (i < b.length) steps.push(b[i]);
+  }
+  return ["step", ["coalesce", ["get", fld.key], 0], ...steps];
+}
+
+function renderLegend(geojson, fld) {
+  const b = quantileBreaks(fieldValues(geojson, fld.key));
+  document.getElementById("legend-title").textContent = fld.label;
+  const rows = document.getElementById("legend-rows");
+  rows.innerHTML = "";
+  for (let i = 0; i < COLORS.length; i++) {
+    if (i >= b.length + 1) break;
+    const lo = i === 0 ? null : b[i - 1], hi = i < b.length ? b[i] : null;
+    const label = lo == null ? `≤ ${fld.fmt(hi)}` :
+                  hi == null ? `> ${fld.fmt(lo)}` : `${fld.fmt(lo)} – ${fld.fmt(hi)}`;
+    rows.insertAdjacentHTML("beforeend",
+      `<div class="row"><span class="swatch" style="background:${COLORS[i]}"></span>` +
+      `<span class="val">${label}</span></div>`);
+  }
+}
+
+function renderFieldButtons(geojson) {
+  const el = document.getElementById("fields");
+  el.innerHTML = "";
+  for (const fld of FIELDS) {
+    const available = geojson.features.some(f => f.properties[fld.key] != null);
+    if (!available) continue;
+    const btn = document.createElement("button");
+    btn.textContent = fld.label;
+    if (fld === field) btn.classList.add("active");
+    btn.onclick = () => {
+      field = fld;
+      for (const b of el.children) b.classList.remove("active");
+      btn.classList.add("active");
+      map.setPaintProperty("units-fill", "fill-color", paintFor(geojson, fld));
+      renderLegend(geojson, fld);
+    };
+    el.appendChild(btn);
+  }
+}
+
+function clearHover() {
+  for (const id of hovered) map.setFeatureState({ source: "units", id }, { hover: false });
+  hovered = [];
 }
 
 async function loadCountry(iso) {
@@ -60,98 +194,130 @@ async function loadCountry(iso) {
     fetch(`${iso}/${cfg.geojson || "admin2.geojson"}`).then(r => r.json()),
     fetch(`${iso}/meta.json`).then(r => r.json()),
   ]);
-  document.getElementById("title").textContent =
-    `${cfg.country} (${cfg.iso3}) \u2014 crisis baseline`;
-  document.getElementById("subtitle").textContent =
-    `${cfg.admin2_count} admin-2 units \u00b7 national population ` +
-    `${fmt(cfg.total_population)} \u00b7 built ${cfg.date} \u00b7 ` +
-    `<a href="https://github.com/alfredshingai/crisis-baseline-kit">source &amp; downloads</a>`;
+  current = { iso, cfg, geojson, meta };
 
-  const colors = cfg.colors, b = cfg.breaks, field = cfg.field;
-  const steps = [];
-  for (let i = 0; i < colors.length; i++) {
-    steps.push(colors[i]);
-    if (i < b.length) steps.push(b[i]);
+  const c = countries.find(x => x.iso3 === iso);
+  document.getElementById("country-line").innerHTML =
+    `<b>${cfg.country}</b> · ${cfg.admin2_count} admin units · ` +
+    `pop. ${fmt(cfg.total_population)} · baseline ${cfg.date}`;
+
+  clearHover();
+  const src = map.getSource("units");
+  if (src) src.setData(geojson);
+  else map.addSource("units", { type: "geojson", data: geojson, generateId: true });
+
+  if (!map.getLayer("units-fill")) {
+    const firstSymbol = map.getStyle().layers.find(l => l.type === "symbol");
+    const before = firstSymbol ? firstSymbol.id : undefined;
+    map.addLayer({
+      id: "units-fill", type: "fill", source: "units",
+      paint: {
+        "fill-color": paintFor(geojson, field),
+        "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.95, 0.78],
+      },
+    }, before);
+    map.addLayer({
+      id: "units-line", type: "line", source: "units",
+      paint: {
+        "line-color": "#2c3a48",
+        "line-width": ["case", ["boolean", ["feature-state", "hover"], false], 2.2, 0.6],
+      },
+    }, before);
+  } else {
+    map.setPaintProperty("units-fill", "fill-color", paintFor(geojson, field));
   }
-  const fillColor = b.length ? ["step", ["get", field], ...steps] : colors[colors.length - 1];
-
-  clearLayers();
-  map.addSource("admin2", { type: "geojson", data: geojson });
-  const firstSymbol = map.getStyle().layers.find(l => l.type === "symbol");
-  const before = firstSymbol ? firstSymbol.id : undefined;
-  map.addLayer({
-    id: "admin2-fill", type: "fill", source: "admin2",
-    paint: { "fill-color": fillColor, "fill-opacity": 0.75 },
-  }, before);
-  map.addLayer({
-    id: "admin2-outline", type: "line", source: "admin2",
-    paint: { "line-color": "#333", "line-width": 0.6 },
-  }, before);
-  currentLayerIds = ["admin2-fill", "admin2-outline"];
 
   const bounds = new maplibregl.LngLatBounds();
   for (const f of geojson.features) {
-    const c = f.geometry.coordinates;
-    const pts = f.geometry.type === "Polygon" ? c.flat(1) : c.flat(2);
+    const cpts = f.geometry.coordinates;
+    const pts = f.geometry.type === "Polygon" ? cpts.flat(1) : cpts.flat(2);
     for (const p of pts) bounds.extend(p);
   }
-  map.fitBounds(bounds, { padding: 40 });
+  map.fitBounds(bounds, { padding: 50, duration: 600 });
 
-  map.on("click", "admin2-fill", (e) => {
-    const p = e.features[0].properties;
-    new maplibregl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(`<table>
-        <tr><td><b>Unit</b></td><td>${p.adm2_name ?? "-"}</td></tr>
-        <tr><td>P-code</td><td>${p.adm2_pcode ?? "-"}</td></tr>
-        <tr><td>Population</td><td>${fmt(p.population_sum)}</td></tr>
-        ${p.facility_count != null ? `<tr><td>Health facilities</td><td>${fmt(p.facility_count)} (${fmt(p.facilities_per_10k_pop)} per 10k)</td></tr>` : ""}
-        <tr><td>Area (km\u00b2)</td><td>${fmt(p.area_km2)}</td></tr>
-        <tr><td>Density (/km\u00b2)</td><td>${fmt(p.pop_density_km2)}</td></tr>
-      </table>`)
-      .addTo(map);
-  });
-  map.on("mouseenter", "admin2-fill", () => map.getCanvas().style.cursor = "pointer");
-  map.on("mouseleave", "admin2-fill", () => map.getCanvas().style.cursor = "");
-
-  document.getElementById("legend-title").textContent = cfg.label;
-  const rows = document.getElementById("legend-rows");
-  rows.innerHTML = "";
-  for (let i = 0; i < colors.length; i++) {
-    const lo = i === 0 ? null : b[i - 1];
-    const hi = i < b.length ? b[i] : null;
-    const label = lo == null ? `\u2264 ${fmt(hi)}` :
-                  hi == null ? `> ${fmt(lo)}` : `${fmt(lo)} \u2013 ${fmt(hi)}`;
-    const div = document.createElement("div");
-    div.innerHTML = `<span class="swatch" style="background:${colors[i]}"></span>${label}`;
-    rows.appendChild(div);
-  }
+  renderFieldButtons(geojson);
+  renderLegend(geojson, field);
   document.getElementById("attrib").innerHTML =
-    "Data: " + meta.sources.map(s => `${s.attribution} (${s.license})`).join(" \u00b7 ");
+    "Data: " + meta.sources.map(s => `${s.attribution} (${s.license})`).join(" · ");
+
+  for (const b of document.querySelectorAll("#list .item"))
+    b.classList.toggle("active", b.dataset.iso === iso);
 }
 
-fetch("countries.json").then(r => r.json()).then(countries => {
+function initList() {
+  const list = document.getElementById("list");
+  const q = document.getElementById("q");
+  const render = (filter = "") => {
+    const f = filter.trim().toLowerCase();
+    list.innerHTML = "";
+    for (const c of countries) {
+      if (f && !(c.name.toLowerCase().includes(f) || c.iso3.toLowerCase().includes(f))) continue;
+      const btn = document.createElement("button");
+      btn.className = "item";
+      btn.dataset.iso = c.iso3;
+      btn.innerHTML = `<span class="iso">${c.iso3}</span><span>${c.name}</span>` +
+                      `<span class="pop">${c.pop_m != null ? c.pop_m.toFixed(1) + "M" : ""}</span>`;
+      btn.onclick = () => loadCountry(c.iso3);
+      list.appendChild(btn);
+    }
+  };
+  q.addEventListener("input", () => render(q.value));
+  render();
+  document.getElementById("count").textContent = `${countries.length} country baselines`;
+}
+
+fetch("countries.json").then(r => r.json()).then(cs => {
+  countries = cs;
   map = new maplibregl.Map({
     container: "map",
-    style: "https://demotiles.maplibre.org/style.json",
-    center: [33.7, -13.2],
-    zoom: 5,
+    style: {
+      version: 8,
+      sources: {
+        carto: {
+          type: "raster",
+          "tiles": ["https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"],
+          tileSize: 256,
+          attribution: "Basemap © Esri, HERE, Garmin, FAO, NOAA, USGS",
+        },
+      },
+      layers: [
+        { id: "bg", type: "background", paint: { "background-color": "#f7f8fa" } },
+        { id: "basemap", type: "raster", source: "carto" },
+      ],
+    },
+    center: [20, 2], zoom: 2.6, attributionControl: false,
   });
-  const switcher = document.getElementById("switcher");
-  for (const c of countries) {
-    const btn = document.createElement("button");
-    btn.textContent = c.name;
-    btn.title = `${c.name} (${c.iso3}), baseline ${c.date}`;
-    btn.onclick = () => {
-      for (const b of switcher.children) b.classList.remove("active");
-      btn.classList.add("active");
-      loadCountry(c.iso3);
-    };
-    switcher.appendChild(btn);
-  }
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), "top-right");
   map.on("load", () => {
-    switcher.firstChild.classList.add("active");
+    initList();
     loadCountry(countries[0].iso3);
+    map.on("mousemove", "units-fill", (e) => {
+      if (e.features.length) {
+        clearHover();
+        for (const f of e.features) {
+          map.setFeatureState({ source: "units", id: f.id }, { hover: true });
+          hovered.push(f.id);
+        }
+        map.getCanvas().style.cursor = "pointer";
+      }
+    });
+    map.on("mouseleave", "units-fill", () => { clearHover(); map.getCanvas().style.cursor = ""; });
+    map.on("click", "units-fill", (e) => {
+      const p = e.features[0].properties;
+      const rows = [
+        ["Unit", p.adm2_name ?? p.adm1_name ?? "–"],
+        ["P-code", p.adm2_pcode ?? p.adm1_pcode ?? "–"],
+      ];
+      if (p.population_sum != null) rows.push(["Population", fmt(p.population_sum)]);
+      if (p.area_km2 != null) rows.push(["Area (km²)", fmt(p.area_km2)]);
+      if (p.pop_density_km2 != null) rows.push(["Density (/km²)", fmt(p.pop_density_km2, 1)]);
+      if (p.facility_count != null)
+        rows.push(["Health facilities", `${fmt(p.facility_count)} (${fmt(p.facilities_per_10k_pop, 1)} per 10k)`]);
+      new maplibregl.Popup({ maxWidth: "280px" })
+        .setLngLat(e.lngLat)
+        .setHTML("<table>" + rows.map(r => `<tr><td class="k">${r[0]}</td><td>${r[1]}</td></tr>`).join("") + "</table>")
+        .addTo(map);
+    });
   });
 });
 </script>

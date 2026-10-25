@@ -1,0 +1,10 @@
+STP OK admin2= facilities=-
+ESH OK admin2= facilities=-
+GAB OK admin2=48 facilities=382
+SSD OK admin2=79 facilities=494
+SLE OK admin2=16 facilities=558
+TCD OK admin2=70 facilities=447
+MLI OK admin2=160 facilities=1513
+LBY OK admin2=22 facilities=2981
+SDN OK admin2=189 facilities=1427
+ZAF FAIL: requests.exceptions.ConnectionError: HTTPSConnectionPool(host='data.worldpop.org', port=443): Read timed out.

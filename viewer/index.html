@@ -7,19 +7,41 @@
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
-  body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+  :root {
+    --panel: #ffffff; --line: #e3e6ea; --ink: #1c2430;
+    --muted: #5b6675; --accent: #0c5d8c; --accent-soft: #e8f2f8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+         color: var(--ink); background: #f7f8fa; }
   #map { position: absolute; inset: 0; }
-  header { position: absolute; top: 0; left: 0; right: 0; z-index: 2;
-           padding: 10px 14px; background: rgba(255,255,255,.92);
-           border-bottom: 1px solid #ddd; }
-  header h1 { font-size: 16px; margin: 0; }
-  header p { font-size: 12px; margin: 2px 0 0; color: #555; }
-  #legend { position: absolute; right: 10px; bottom: 10px; z-index: 2;
-            background: rgba(255,255,255,.92); border: 1px solid #ddd;
-            padding: 8px 10px; font-size: 12px; max-width: 240px; }
-  .swatch { display: inline-block; width: 12px; height: 12px;
-            margin-right: 6px; vertical-align: -1px; }
-  .maplibregl-popup td { padding: 2px 8px 2px 0; font-size: 12px; }
+  header { position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+           display: flex; align-items: baseline; gap: 12px;
+           padding: 10px 16px; background: rgba(255,255,255,.95);
+           border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 15px; margin: 0; }
+  header p { font-size: 12.5px; margin: 0; color: var(--muted); }
+  #fields { position: absolute; top: 56px; left: 12px; z-index: 5; display: flex;
+            gap: 4px; padding: 4px; background: rgba(255,255,255,.95);
+            border: 1px solid var(--line); border-radius: 9px;
+            box-shadow: 0 4px 14px rgba(20,30,45,.10); }
+  #fields button { border: 0; background: none; padding: 6px 12px; font-size: 12.5px;
+                   border-radius: 6px; cursor: pointer; color: var(--muted); }
+  #fields button.active { background: var(--accent); color: #fff; font-weight: 600; }
+  #fields button:not(.active):hover { background: var(--accent-soft); color: var(--accent); }
+  #legend { position: absolute; right: 12px; bottom: 26px; z-index: 5;
+            background: rgba(255,255,255,.95); border: 1px solid var(--line);
+            border-radius: 9px; box-shadow: 0 4px 14px rgba(20,30,45,.10);
+            padding: 10px 12px; font-size: 12px; min-width: 170px; }
+  #legend b { display: block; margin-bottom: 6px; }
+  #legend .row { display: flex; align-items: center; gap: 7px; margin-top: 3px; }
+  #legend .swatch { width: 13px; height: 13px; border-radius: 3px; }
+  #attrib { position: absolute; left: 12px; bottom: 0; z-index: 5; font-size: 10.5px;
+            background: rgba(255,255,255,.9); padding: 3px 8px; border-radius: 6px 6px 0 0;
+            color: var(--muted); max-width: 60%; }
+  .maplibregl-popup-content { font-size: 12.5px; }
+  .maplibregl-popup table td { padding: 2px 10px 2px 0; }
+  .maplibregl-popup td.k { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -28,46 +50,104 @@
   <p id="subtitle"></p>
 </header>
 <div id="map"></div>
+<div id="fields"></div>
 <div id="legend"><b id="legend-title"></b><div id="legend-rows"></div></div>
+<div id="attrib"></div>
 <script>
-const fmt = n => (n == null || Number.isNaN(Number(n))) ? "-" :
-  Number(n).toLocaleString(undefined, {maximumFractionDigits: 0});
+const COLORS = ["#edf8fb","#ccece6","#a8ddb5","#7bccc4","#4eb3d3","#2b8cbe","#08589e"];
+const FIELDS = [
+  { key: "population_sum",     label: "Population",   fmt: v => fmt(v) },
+  { key: "pop_density_km2",    label: "Density /km²", fmt: v => fmt(v) },
+  { key: "facilities_per_10k_pop", label: "Facilities /10k", fmt: v => fmt(v, 1) },
+];
+const fmt = (n, d = 0) => (n == null || Number.isNaN(Number(n))) ? "–" :
+  Number(n).toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
+
+function quantileBreaks(values, n = 7) {
+  const v = values.filter(x => x != null && !Number.isNaN(x)).sort((a, b) => a - b);
+  if (!v.length) return [];
+  const breaks = [];
+  for (let i = 1; i < n; i++) {
+    const b = v[Math.floor((i / n) * v.length)];
+    if (!breaks.length || b > breaks[breaks.length - 1]) breaks.push(b);
+  }
+  return breaks;
+}
+const vals = (geojson, key) => geojson.features.map(f => f.properties[key]);
+
+function paintFor(geojson, fld) {
+  const b = quantileBreaks(vals(geojson, fld.key));
+  if (!b.length) return COLORS[COLORS.length - 1];
+  const steps = [];
+  for (let i = 0; i < COLORS.length; i++) {
+    steps.push(COLORS[i]);
+    if (i < b.length) steps.push(b[i]);
+  }
+  return ["step", ["coalesce", ["get", fld.key], 0], ...steps];
+}
 
 const cfgP = fetch("viewer_config.json").then(r => r.json());
 const geoP = cfgP.then(cfg => fetch(cfg.geojson || "admin2.geojson")).then(r => r.json());
-Promise.all([cfgP, geoP]).then(([cfg, geojson]) => {
-  document.getElementById("title").textContent =
-    `${cfg.country} (${cfg.iso3}) \u2014 crisis baseline`;
-  document.getElementById("subtitle").textContent =
-    `${cfg.admin2_count} admin-2 units \u00b7 national population ` +
-    `${fmt(cfg.total_population)} \u00b7 built ${cfg.date}`;
+const metaP = cfgP.then(() => fetch("meta.json").then(r => r.json())).catch(() => null);
 
-  const colors = cfg.colors, b = cfg.breaks, field = cfg.field;
-  const steps = [];
-  for (let i = 0; i < colors.length; i++) {
-    steps.push(colors[i]);
-    if (i < b.length) steps.push(b[i]);
-  }
-  const fillColor = b.length ? ["step", ["get", field], ...steps] : colors[colors.length - 1];
+Promise.all([cfgP, geoP, metaP]).then(([cfg, geojson, meta]) => {
+  let field = FIELDS[0];
+  document.getElementById("title").textContent = `${cfg.country} (${cfg.iso3}) — crisis baseline`;
+  document.getElementById("subtitle").textContent =
+    `${cfg.admin2_count} admin units · national population ${fmt(cfg.total_population)} · built ${cfg.date}`;
 
   const map = new maplibregl.Map({
     container: "map",
-    style: "https://demotiles.maplibre.org/style.json",
-    center: [33.7, -13.2],
-    zoom: 6,
+    style: {
+      version: 8,
+      sources: {
+        carto: {
+          type: "raster",
+          "tiles": ["https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"],
+          tileSize: 256,
+          attribution: "Basemap © Esri, HERE, Garmin, FAO, NOAA, USGS",
+        },
+      },
+      layers: [
+        { id: "bg", type: "background", paint: { "background-color": "#f7f8fa" } },
+        { id: "basemap", type: "raster", source: "carto" },
+      ],
+    },
+    center: [33.7, -13.2], zoom: 5, attributionControl: false,
   });
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), "top-right");
+
+  const renderLegend = () => {
+    const b = quantileBreaks(vals(geojson, field.key));
+    document.getElementById("legend-title").textContent = field.label;
+    const rows = document.getElementById("legend-rows");
+    rows.innerHTML = "";
+    for (let i = 0; i < COLORS.length; i++) {
+      if (i >= b.length + 1) break;
+      const lo = i === 0 ? null : b[i - 1], hi = i < b.length ? b[i] : null;
+      const label = lo == null ? `≤ ${field.fmt(hi)}` :
+                    hi == null ? `> ${field.fmt(lo)}` : `${field.fmt(lo)} – ${field.fmt(hi)}`;
+      rows.insertAdjacentHTML("beforeend",
+        `<div class="row"><span class="swatch" style="background:${COLORS[i]}"></span>${label}</div>`);
+    }
+  };
+
   map.on("load", () => {
-    map.addSource("admin2", { type: "geojson", data: geojson });
-    const firstSymbol = map.getStyle().layers.find(l => l.type === "symbol");
-    const before = firstSymbol ? firstSymbol.id : undefined;
+    map.addSource("units", { type: "geojson", data: geojson, generateId: true });
     map.addLayer({
-      id: "admin2-fill", type: "fill", source: "admin2",
-      paint: { "fill-color": fillColor, "fill-opacity": 0.75 },
-    }, before);
+      id: "units-fill", type: "fill", source: "units",
+      paint: {
+        "fill-color": paintFor(geojson, field),
+        "fill-opacity": ["case", ["boolean", ["feature-state", "hover"], false], 0.95, 0.78],
+      },
+    });
     map.addLayer({
-      id: "admin2-outline", type: "line", source: "admin2",
-      paint: { "line-color": "#333", "line-width": 0.6 },
-    }, before);
+      id: "units-line", type: "line", source: "units",
+      paint: {
+        "line-color": "#2c3a48",
+        "line-width": ["case", ["boolean", ["feature-state", "hover"], false], 2.2, 0.6],
+      },
+    });
 
     const bounds = new maplibregl.LngLatBounds();
     for (const f of geojson.features) {
@@ -75,38 +155,57 @@ Promise.all([cfgP, geoP]).then(([cfg, geojson]) => {
       const pts = f.geometry.type === "Polygon" ? c.flat(1) : c.flat(2);
       for (const p of pts) bounds.extend(p);
     }
-    map.fitBounds(bounds, { padding: 40 });
+    map.fitBounds(bounds, { padding: 50 });
 
-    map.on("click", "admin2-fill", (e) => {
+    // field buttons
+    const el = document.getElementById("fields");
+    for (const fld of FIELDS) {
+      if (!geojson.features.some(f => f.properties[fld.key] != null)) continue;
+      const btn = document.createElement("button");
+      btn.textContent = fld.label;
+      if (fld === field) btn.classList.add("active");
+      btn.onclick = () => {
+        field = fld;
+        for (const b of el.children) b.classList.remove("active");
+        btn.classList.add("active");
+        map.setPaintProperty("units-fill", "fill-color", paintFor(geojson, fld));
+        renderLegend();
+      };
+      el.appendChild(btn);
+    }
+    renderLegend();
+    if (meta) document.getElementById("attrib").innerHTML =
+      "Data: " + meta.sources.map(s => `${s.attribution} (${s.license})`).join(" · ");
+
+    let hovered = [];
+    map.on("mousemove", "units-fill", (e) => {
+      for (const id of hovered) map.setFeatureState({ source: "units", id }, { hover: false });
+      hovered = e.features.map(f => f.id);
+      for (const id of hovered) map.setFeatureState({ source: "units", id }, { hover: true });
+      map.getCanvas().style.cursor = "pointer";
+    });
+    map.on("mouseleave", "units-fill", () => {
+      for (const id of hovered) map.setFeatureState({ source: "units", id }, { hover: false });
+      hovered = [];
+      map.getCanvas().style.cursor = "";
+    });
+    map.on("click", "units-fill", (e) => {
       const p = e.features[0].properties;
-      new maplibregl.Popup()
+      const rows = [
+        ["Unit", p.adm2_name ?? p.adm1_name ?? "–"],
+        ["P-code", p.adm2_pcode ?? p.adm1_pcode ?? "–"],
+      ];
+      if (p.population_sum != null) rows.push(["Population", fmt(p.population_sum)]);
+      if (p.area_km2 != null) rows.push(["Area (km²)", fmt(p.area_km2)]);
+      if (p.pop_density_km2 != null) rows.push(["Density (/km²)", fmt(p.pop_density_km2, 1)]);
+      if (p.facility_count != null)
+        rows.push(["Health facilities", `${fmt(p.facility_count)} (${fmt(p.facilities_per_10k_pop, 1)} per 10k)`]);
+      new maplibregl.Popup({ maxWidth: "280px" })
         .setLngLat(e.lngLat)
-        .setHTML(`<table>
-          <tr><td><b>Unit</b></td><td>${p.adm2_name ?? "-"}</td></tr>
-          <tr><td>P-code</td><td>${p.adm2_pcode ?? "-"}</td></tr>
-          <tr><td>Population</td><td>${fmt(p.population_sum)}</td></tr>
-          ${p.facility_count != null ? `<tr><td>Health facilities</td><td>${fmt(p.facility_count)} (${fmt(p.facilities_per_10k_pop)} per 10k)</td></tr>` : ""}
-          <tr><td>Area (km\u00b2)</td><td>${fmt(p.area_km2)}</td></tr>
-          <tr><td>Density (/km\u00b2)</td><td>${fmt(p.pop_density_km2)}</td></tr>
-        </table>`)
+        .setHTML("<table>" + rows.map(r => `<tr><td class="k">${r[0]}</td><td>${r[1]}</td></tr>`).join("") + "</table>")
         .addTo(map);
     });
-    map.on("mouseenter", "admin2-fill", () => map.getCanvas().style.cursor = "pointer");
-    map.on("mouseleave", "admin2-fill", () => map.getCanvas().style.cursor = "");
   });
-
-  // Legend
-  document.getElementById("legend-title").textContent = cfg.label;
-  const rows = document.getElementById("legend-rows");
-  for (let i = 0; i < colors.length; i++) {
-    const lo = i === 0 ? null : b[i - 1];
-    const hi = i < b.length ? b[i] : null;
-    const label = lo == null ? `\u2264 ${fmt(hi)}` :
-                  hi == null ? `> ${fmt(lo)}` : `${fmt(lo)} \u2013 ${fmt(hi)}`;
-    const div = document.createElement("div");
-    div.innerHTML = `<span class="swatch" style="background:${colors[i]}"></span>${label}`;
-    rows.appendChild(div);
-  }
 });
 </script>
 </body>

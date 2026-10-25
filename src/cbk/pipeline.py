@@ -119,6 +119,14 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     if facilities is not None:
         output_files["facilities.parquet"] = bundle_dir / "facilities.parquet"
     manifest = build_manifest(profile, results, bundle_dir, quality, output_files=output_files)
+    (bundle_dir / "meta.json").write_text(json.dumps({
+        "iso3": profile.iso3,
+        "date": bundle_dir.name,
+        "sources": [
+            {"layer": res.layer, "attribution": res.attribution, "license": res.license}
+            for res in results.values()
+        ],
+    }, indent=2), encoding="utf-8")
     render_readme(bundle_dir, profile, manifest, {
         "population_total": population_total,
         "admin2_count": int(len(admin2)),

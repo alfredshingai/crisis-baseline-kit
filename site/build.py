@@ -37,8 +37,8 @@ def main() -> None:
         if not iso_dir.is_dir():
             continue
         bundle = latest_bundle(iso_dir)
-        if bundle is None:
-            continue
+        if bundle is None or not (bundle / "viewer_config.json").is_file():
+            continue  # failed or incomplete build
         iso = iso_dir.name
         out = SITE_OUT / iso
         out.mkdir(exist_ok=True)
@@ -58,7 +58,12 @@ def main() -> None:
             encoding="utf-8",
         )
         cfg = json.loads((bundle / "viewer_config.json").read_text(encoding="utf-8"))
-        countries.append({"iso3": iso, "name": cfg["country"], "date": bundle.name})
+        countries.append({
+            "iso3": iso,
+            "name": cfg["country"],
+            "date": bundle.name,
+            "pop_m": round(cfg.get("total_population", 0) / 1e6, 1),
+        })
 
     if not countries:
         sys.exit("no country bundles found under baselines/")

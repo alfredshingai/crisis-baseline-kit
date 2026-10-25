@@ -25,6 +25,8 @@ layers:
     optional: true
 
 checks:
+  # As built 2026-10-25 (COD-AB feature count 135); +/-3 for minor source updates.
+  expected_admin2_count: [132, 138]
   # UN WPP 2020 estimate: 47.00M; gate is +/-40% (min 0.10M wide).
   # WorldPop unconstrained can deviate further in forest-heavy states (e.g. Gabon runs ~30% high).
   expected_population_total_millions: [28.20, 65.80]
