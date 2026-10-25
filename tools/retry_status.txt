@@ -8,3 +8,9 @@ MLI OK admin2=160 facilities=1513
 LBY OK admin2=22 facilities=2981
 SDN OK admin2=189 facilities=1427
 ZAF FAIL: requests.exceptions.ConnectionError: HTTPSConnectionPool(host='data.worldpop.org', port=443): Read timed out.
+COD OK admin2=164 facilities=3738
+DZA OK admin2=1541 facilities=11229
+EGY OK admin2=365 facilities=1950
+BWA OK admin2=28 facilities=249
+TZA FAIL: RuntimeError: No admin level 0 found in COD-AB extract; files: ['tza_admbndl_ALL_20181019.cpg', 'tza_admbndl_ALL_20181019.dbf', 'tza_admbndl_ALL_20181019.prj', 'tza_admbndl_ALL_20181019.sbn', 'tza_admbndl_ALL_20181019.sbx', 'tza_admbndl_ALL_20181019.shp', 'tza_admbndl_ALL_20181019.shp.xml', 'tza_admbndl_ALL_20181019.shx']
+WAVE COMPLETE
