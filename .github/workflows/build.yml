@@ -21,10 +21,14 @@ jobs:
       - run: python -m pip install -e .
       - run: cbk selftest
 
-  build-mwi:
+  build-baselines:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        country: [MWI, MOZ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -33,9 +37,9 @@ jobs:
           cache: pip
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e .
-      - run: cbk build MWI --out baselines
+      - run: cbk build ${{ matrix.country }} --out baselines
       - uses: actions/upload-artifact@v4
         with:
-          name: mwi-baseline
-          path: baselines/MWI/**
+          name: ${{ matrix.country }}-baseline
+          path: baselines/${{ matrix.country }}/**
           if-no-files-found: error

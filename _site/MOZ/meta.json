@@ -1,0 +1,21 @@
+{
+  "iso3": "MOZ",
+  "date": "2026-10-25",
+  "sources": [
+    {
+      "layer": "admin_boundaries",
+      "attribution": "INE- Instituto Nacional de Estatisca\n  via HDX (Mozambique - Subnational Administrative Boundaries)",
+      "license": "Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)"
+    },
+    {
+      "layer": "population",
+      "attribution": "WorldPop (MOZ 2020, ppp, 100 m)",
+      "license": "CC-BY 4.0"
+    },
+    {
+      "layer": "facilities",
+      "attribution": "healthsites.io via HDX (Mozambique Healthsites)",
+      "license": "ODbL"
+    }
+  ]
+}

@@ -79,6 +79,10 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     admin2 = zonal_sum(raster, admin[2], key)
     admin2 = add_derived(admin2, profile.crs_analysis)
 
+    facilities = None
+    if "facilities" in results:
+        admin2, facilities = _join_facilities(admin2, results["facilities"])
+
     gpkg = bundle_dir / "cbk_baseline.gpkg"
     for i, level in enumerate(sorted(admin)):
         layer_gdf = admin2 if level == 2 else admin[level]
@@ -86,6 +90,9 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
             layer_gdf.to_file(gpkg, layer=f"admin{level}", driver="GPKG")
         else:
             layer_gdf.to_file(gpkg, layer=f"admin{level}", driver="GPKG", mode="a")
+    if facilities is not None:
+        facilities.to_file(gpkg, layer="facilities", driver="GPKG", mode="a")
+        facilities.to_parquet(bundle_dir / "facilities.parquet")
     admin2.to_parquet(bundle_dir / "admin2.parquet")
     admin2.to_file(bundle_dir / "admin2.geojson", driver="GeoJSON")
 
@@ -100,6 +107,8 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
         "admin2.parquet": bundle_dir / "admin2.parquet",
         "admin2.geojson": bundle_dir / "admin2.geojson",
     }
+    if facilities is not None:
+        output_files["facilities.parquet"] = bundle_dir / "facilities.parquet"
     manifest = build_manifest(profile, results, bundle_dir, quality, output_files=output_files)
     render_readme(bundle_dir, profile, manifest, {
         "population_total": population_total,
@@ -111,6 +120,31 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
         failed = [c["check"] for c in quality if c["status"] == "FAIL"]
         raise RuntimeError(f"Quality gate failed: {failed}; see quality_report.json")
     return bundle_dir
+
+
+def _join_facilities(admin2: gpd.GeoDataFrame, fac_result) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    """Count facilities per admin-2 unit (points-in-polygon spatial join).
+
+    Facility points stay a separate table (ODbL share-alike source); only
+    the count aggregate is joined into the admin-2 table.
+    """
+    fac = gpd.read_file(fac_result.outputs["facilities"])
+    if fac.crs is None:
+        fac = fac.set_crs("EPSG:4326")
+    fac = fac.to_crs(admin2.crs)
+    key = "adm2_pcode"
+    joined = gpd.sjoin(fac, admin2[[key, "geometry"]], predicate="within", how="inner")
+    counts = joined.groupby(key).size().rename("facility_count")
+    out = admin2.merge(counts, left_on=key, right_index=True, how="left")
+    out["facility_count"] = out["facility_count"].fillna(0).astype("int64")
+    out["facilities_per_10k_pop"] = (
+        out["facility_count"] / out["population_sum"].where(out["population_sum"] > 0) * 10_000
+    ).round(2)
+    log.info(
+        "facilities: %d points, %d of %d admin-2 units have at least one",
+        len(fac), int((out["facility_count"] > 0).sum()), len(out),
+    )
+    return out, fac
 
 
 def _quantile_breaks(values, n: int = 5) -> list[float]:

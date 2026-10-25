@@ -1,0 +1,39 @@
+# Country profile: Mozambique
+# Second country — validates that adding a country is just a profile.
+# Narrative: cyclone exposure (Cyclone Freddy 2023) and the cross-border
+# Zambezi basin story shared with Malawi.
+
+iso3: MOZ
+name: Mozambique
+profile_version: 0.2.0
+
+hdx_slug: cod-ab-moz
+
+# Mozambique spans UTM zones 36S and 37S, so a single UTM CRS would distort
+# areas at one edge. Use an Africa-wide equal-area projection for area stats.
+crs_analysis: "ESRI:102022"   # Africa Albers Equal Area Conic
+
+layers:
+  admin_boundaries:
+    adapter: codab
+    params:
+      admin_levels: [0, 1, 2]
+
+  population:
+    adapter: worldpop
+    params:
+      year: 2020
+      dataset: ppp
+
+  facilities:
+    adapter: healthsites
+
+checks:
+  # Mozambique COD-AB admin-2 = districts; ~157-165 depending on vintage.
+  expected_admin2_count: [148, 172]
+  # WorldPop 2020 national total is ~29-31.5M depending on variant.
+  expected_population_total_millions: [27, 33]
+
+viewer:
+  choropleth_field: population_sum
+  choropleth_label: "Population (WorldPop 2020, unconstrained)"

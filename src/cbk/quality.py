@@ -54,6 +54,10 @@ def run_checks(
             missing = int(admin[2]["population_sum"].isna().sum())
             add("admin2_population_assigned", "FAIL" if missing else "PASS",
                 f"{missing} admin-2 units without a population value")
+        if "facility_count" in admin[2].columns:
+            total = int(admin[2]["facility_count"].sum())
+            add("facilities_present", "FAIL" if total == 0 else "PASS",
+                f"{total} facilities joined to admin-2 units")
 
     if "expected_population_total_millions" in checks:
         lo, hi = checks["expected_population_total_millions"]

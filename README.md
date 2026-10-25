@@ -11,8 +11,11 @@
 
 ![Malawi baseline viewer](docs/img/malawi-viewer.png)
 
-*The bundled map viewer showing the v0.1 Malawi baseline: population per
-admin-2 unit (WorldPop 2020) over OCHA COD-AB boundaries.*
+*The bundled map viewer showing the Malawi baseline: population per
+admin-2 unit (WorldPop 2020) over OCHA COD-AB boundaries, with health
+facility counts per district. Try the [live map](https://alfredshingai.github.io/crisis-baseline-kit/).*
+
+**Countries:** Malawi (MWI) · Mozambique (MOZ) — each one is a YAML profile.
 
 ## The problem
 
@@ -99,13 +102,17 @@ country profile (YAML) ──► adapters ──► pipeline ──► dated bun
 
 ## Roadmap
 
-- v0.2 — roads & buildings (OSM), health facilities, schools; PMTiles
-  output; bundle diffing ("what changed since last month's baseline")
+- ~~health facilities~~ ✓ v0.2 — `facility_count` & `facilities_per_10k_pop`
+  per district, from healthsites.io (ODbL, kept in a separate table)
+- ~~live map~~ ✓ v0.2 — [GitHub Pages site](https://alfredshingai.github.io/crisis-baseline-kit/),
+  auto-published from the weekly CI rebuild
+- next — roads & buildings (OSM), schools; PMTiles output; bundle diffing
+  ("what changed since last month's baseline")
 - v0.3 — hazard layers (JRC surface water, Copernicus DEM) and simple
   exposure scoring per admin unit
 - growth — more countries (each one is a YAML file), a cross-country
   Parquet dataset for region-wide queries, cross-border regions
-  (e.g. the Zambezi basin)
+  (e.g. the Zambezi basin shared by Malawi and Mozambique)
 
 ## Contributing
 

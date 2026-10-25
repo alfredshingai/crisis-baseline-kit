@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from .base import Adapter, BuildContext, LayerResult
 from .codab import CodabAdapter
+from .healthsites import HealthsitesAdapter
 from .worldpop import WorldPopAdapter
 
 ADAPTERS: dict[str, type[Adapter]] = {
     cls.name: cls
-    for cls in (CodabAdapter, WorldPopAdapter)
+    for cls in (CodabAdapter, WorldPopAdapter, HealthsitesAdapter)
 }

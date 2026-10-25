@@ -5,7 +5,7 @@
 
 iso3: MWI
 name: Malawi
-profile_version: 0.1.0
+profile_version: 0.2.0
 
 # HDX dataset slug for OCHA administrative boundaries (COD-AB)
 hdx_slug: cod-ab-mwi
@@ -24,6 +24,9 @@ layers:
     params:
       year: 2020
       dataset: ppp        # "ppp" (unconstrained) or "ppp_UNadj" (UN-adjusted)
+
+  facilities:
+    adapter: healthsites
 
 # Quality gate: the build FAILS (non-zero exit) if any expectation is violated.
 checks:

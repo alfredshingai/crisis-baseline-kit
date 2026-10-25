@@ -86,6 +86,7 @@ Promise.all([
           <tr><td><b>Unit</b></td><td>${p.adm2_name ?? "-"}</td></tr>
           <tr><td>P-code</td><td>${p.adm2_pcode ?? "-"}</td></tr>
           <tr><td>Population</td><td>${fmt(p.population_sum)}</td></tr>
+          ${p.facility_count != null ? `<tr><td>Health facilities</td><td>${fmt(p.facility_count)} (${fmt(p.facilities_per_10k_pop)} per 10k)</td></tr>` : ""}
           <tr><td>Area (km\u00b2)</td><td>${fmt(p.area_km2)}</td></tr>
           <tr><td>Density (/km\u00b2)</td><td>${fmt(p.pop_density_km2)}</td></tr>
         </table>`)
