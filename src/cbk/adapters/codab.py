@@ -44,31 +44,29 @@ def _find_package(session, slug: str, iso3: str) -> dict:
     raise RuntimeError(f"Could not find a COD-AB dataset on HDX for {iso3}")
 
 
-def _pick_resource(pkg: dict) -> dict:
-    """Choose the boundary resource (zip/gpkg/shapefile) from a COD-AB package."""
-
+def _pick_resources(pkg: dict) -> list[dict]:
+    """All plausible boundary resources, best first."""
     def rank(res: dict) -> tuple[int, int, int]:
         fmt = (res.get("format") or "").lower()
         ext = Path(res.get("url") or "").suffix.lower().lstrip(".")
         fmt_rank = 0
-        for i, key in enumerate(("geojson", "shp", "gpkg", "zip")):
+        for i, key in enumerate(("geojson", "shp", "gpkg", "zip", "gdb", "geodatabase")):
             if key in fmt or ext == key:
                 fmt_rank = i + 1
+                break
         name_url = (res.get("name", "") + " " + (res.get("url") or "")).lower()
-        return (1 if "adm" in name_url else 0, fmt_rank, len(res.get("url") or ""))
+        bad = any(k in name_url for k in ("jpg", "jpeg", "pdf", "png", "preview"))
+        return (0 if bad else 1, fmt_rank, len(res.get("url") or ""))
 
-    candidates = []
+    cands = []
     for res in pkg.get("resources", []):
         fmt = (res.get("format") or "").lower()
         ext = Path(res.get("url") or "").suffix.lower().lstrip(".")
-        boundaryish = any(k in fmt for k in ("shp", "zip", "gpkg", "geojson")) or ext in {
-            "zip", "shp", "gpkg", "geojson",
-        }
+        boundaryish = any(k in fmt for k in ("shp", "zip", "gpkg", "geojson", "gdb", "geodatabase")) \
+            or ext in {"zip", "shp", "gpkg", "geojson"}
         if boundaryish:
-            candidates.append(res)
-    if not candidates:
-        raise RuntimeError(f"No boundary resource found in HDX package {pkg.get('name')!r}")
-    return max(candidates, key=rank)
+            cands.append(res)
+    return sorted(cands, key=rank, reverse=True)
 
 
 def _level_from_name(name: str) -> int | None:
@@ -115,11 +113,11 @@ def _read_level(extract_dir: Path, level: int) -> gpd.GeoDataFrame:
         candidates.sort(key=lambda p: (pref.get(p.suffix.lower(), 9), len(p.parts), len(str(p))))
         gdf = gpd.read_file(candidates[0])
     else:
-        # Fallback: a single GeoPackage whose internal layers are named adm0/adm1/...
         gdf = None
         try:
             import pyogrio
 
+            # Fallback 1: single GeoPackage with per-level internal layers
             for p in extract_dir.rglob("*.gpkg"):
                 try:
                     layers = [str(row[0]) for row in pyogrio.list_layers(p)]
@@ -131,6 +129,21 @@ def _read_level(extract_dir: Path, level: int) -> gpd.GeoDataFrame:
                         break
                 if gdf is not None:
                     break
+            # Fallback 2: ESRI file geodatabase directories (*.gdb)
+            if gdf is None:
+                for gdb in extract_dir.rglob("*.gdb"):
+                    if not gdb.is_dir():
+                        continue
+                    try:
+                        layers = [str(row[0]) for row in pyogrio.list_layers(gdb)]
+                    except Exception:
+                        continue
+                    for lname in layers:
+                        if _level_from_name(f"{lname}.x") == level:
+                            gdf = gpd.read_file(gdb, layer=lname)
+                            break
+                    if gdf is not None:
+                        break
         except ImportError:
             pass
         if gdf is None:
@@ -184,18 +197,32 @@ class CodabAdapter(Adapter):
         levels = list(params.get("admin_levels", [0, 1, 2]))
         session = new_session()
         pkg = _find_package(session, ctx.profile.hdx_slug, ctx.profile.iso3)
-        res = _pick_resource(pkg)
-        log.info("COD-AB package %r -> resource %r", pkg.get("title"), res.get("name"))
+        resources = _pick_resources(pkg)
+        if not resources:
+            raise RuntimeError(f"No boundary resource found in HDX package {pkg.get('name')!r}")
 
-        zip_path, _digest = download(res["url"], ctx.raw_dir, session=session)
         extract_dir = ctx.raw_dir / "codab_extract"
-        _extract(zip_path, extract_dir)
+        zip_path = None
+        res = None
+        for res in resources:  # try candidates until one yields every level
+            log.info("COD-AB %r: trying resource %r", pkg.get("title"), res.get("name"))
+            zip_path, _digest = download(res["url"], ctx.raw_dir, session=session)
+            _extract(zip_path, extract_dir)
+            try:
+                frames = {lv: normalize_admin_columns(_read_level(extract_dir, lv), lv) for lv in levels}
+                break
+            except (RuntimeError, ValueError) as exc:
+                log.warning("Resource %r unusable (%s); trying next", res.get("name"), exc)
+                frames = None
+        if not frames:
+            raise RuntimeError(
+                f"No COD-AB resource in {pkg.get('name')!r} yielded admin levels {levels}"
+            )
 
         outputs: dict[str, Path] = {}
         feature_counts: dict[str, int] = {}
         for level in levels:
-            gdf = _read_level(extract_dir, level)
-            gdf = normalize_admin_columns(gdf, level)
+            gdf = frames[level]
             if f"adm{level}_pcode" not in gdf.columns:
                 log.warning("admin%s: no p-code column recognized; quality gate will flag it", level)
             out_path = ctx.data_dir / f"admin{level}.geojson"
