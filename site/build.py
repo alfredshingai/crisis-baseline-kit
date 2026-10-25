@@ -43,7 +43,7 @@ def main() -> None:
         out = SITE_OUT / iso
         out.mkdir(exist_ok=True)
 
-        gdf = gpd.read_file(bundle / "admin2.geojson")
+        gdf = gpd.read_file(next(bundle.glob("admin[0-9].geojson")))
         gdf["geometry"] = gdf.geometry.simplify(SIMPLIFY_TOLERANCE_DEG, preserve_topology=True)
         gdf.to_file(out / "admin2.geojson", driver="GeoJSON")
 

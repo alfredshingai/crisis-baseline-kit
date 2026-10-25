@@ -43,21 +43,25 @@ def run_checks(
         else:
             add(f"admin{level}_pcodes", "FAIL", "no p-code column recognized")
 
-    if 2 in admin:
-        n = len(admin[2])
+    if admin:
+        # Deepest level carries the stats; `expected_admin2_count` applies
+        # to it regardless of actual depth (name kept for compatibility).
+        lvl = max(admin)
+        gdf = admin[lvl]
+        n = len(gdf)
         rng = checks.get("expected_admin2_count")
         if rng:
             ok = rng[0] <= n <= rng[1]
             add("admin2_count_in_range", "PASS" if ok else "FAIL",
-                f"{n} admin-2 units, expected {rng[0]}-{rng[1]}")
-        if "population_sum" in admin[2].columns:
-            missing = int(admin[2]["population_sum"].isna().sum())
+                f"{n} stats-level (admin-{lvl}) units, expected {rng[0]}-{rng[1]}")
+        if "population_sum" in gdf.columns:
+            missing = int(gdf["population_sum"].isna().sum())
             add("admin2_population_assigned", "FAIL" if missing else "PASS",
-                f"{missing} admin-2 units without a population value")
-        if "facility_count" in admin[2].columns:
-            total = int(admin[2]["facility_count"].sum())
+                f"{missing} admin-{lvl} units without a population value")
+        if "facility_count" in gdf.columns:
+            total = int(gdf["facility_count"].sum())
             add("facilities_present", "FAIL" if total == 0 else "PASS",
-                f"{total} facilities joined to admin-2 units")
+                f"{total} facilities joined to admin-{lvl} units")
 
     if "expected_population_total_millions" in checks:
         lo, hi = checks["expected_population_total_millions"]

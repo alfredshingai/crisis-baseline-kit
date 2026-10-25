@@ -110,13 +110,16 @@ def render_readme(bundle_dir: Path, profile, manifest: dict, stats: dict) -> Non
         lines.append(
             f"| {l['layer']} | {l['adapter']} | {src} | {l['license']} | {l['source_version'] or ''} |"
         )
+    lvl = stats.get("stats_level", 2)
+    prefix = f"admin{lvl}"
     lines += [
         "",
         "## Contents",
         "",
-        "- `cbk_baseline.gpkg` - admin 0/1/2 boundaries, admin 2 with population stats (GeoPackage)",
-        "- `admin2.parquet` - admin-2 table (GeoParquet, analysis-ready)",
-        "- `admin2.geojson` - same table for the bundled map viewer",
+        f"- `cbk_baseline.gpkg` - admin boundaries; admin-{lvl} carries the stats (GeoPackage)",
+        f"- `{prefix}.parquet` - admin-{lvl} table (GeoParquet, analysis-ready)",
+        f"- `{prefix}.geojson` - same table for the bundled map viewer",
+        "- `facilities.parquet` - health facility points, separate table (ODbL), when present",
         "- `raw/` - original downloads, checksums in `manifest.json`",
         "- `manifest.json` - full provenance: URLs, licenses, SHA-256, timestamps",
         "- `quality_report.json` - automated quality-gate results",
@@ -124,7 +127,7 @@ def render_readme(bundle_dir: Path, profile, manifest: dict, stats: dict) -> Non
         "## Summary",
         "",
         f"- National population (raster sum): **{total_str}**",
-        f"- Admin-2 units: **{stats.get('admin2_count', 'n/a')}**",
+        f"- Admin-{lvl} units: **{stats.get('admin2_count', 'n/a')}**",
         f"- Quality gate: **{'PASS' if manifest['quality']['passed'] else 'FAIL'}**",
         "",
         "## View the map",

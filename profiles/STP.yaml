@@ -11,7 +11,7 @@ layers:
   admin_boundaries:
     adapter: codab
     params:
-      admin_levels: [0, 1, 2]
+      admin_levels: [0, 1]        # STP COD-AB stops at admin-1
 
   population:
     adapter: worldpop

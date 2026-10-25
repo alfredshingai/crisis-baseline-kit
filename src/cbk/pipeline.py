@@ -78,11 +78,14 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
         for k, p in sorted(admin_paths.items())
         if k.startswith("admin")
     }
-    if 2 not in admin:
-        raise ValueError("admin level 2 is required (COD-AB adapter produced no admin2 output)")
+    if not admin:
+        raise ValueError("no admin levels produced by the COD-AB adapter")
+    # Deepest available level carries the stats (admin-2 normally; some
+    # countries' COD-AB stops at admin-1, e.g. Sao Tome).
+    stats_level = max(admin)
 
-    key = "adm2_pcode"
-    admin2 = zonal_sum(raster, admin[2], key)
+    key = f"adm{stats_level}_pcode"
+    admin2 = zonal_sum(raster, admin[stats_level], key)
     admin2 = add_derived(admin2, profile.crs_analysis)
 
     facilities = None
@@ -91,7 +94,7 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
 
     gpkg = bundle_dir / "cbk_baseline.gpkg"
     for i, level in enumerate(sorted(admin)):
-        layer_gdf = admin2 if level == 2 else admin[level]
+        layer_gdf = admin2 if level == stats_level else admin[level]
         if i == 0:
             layer_gdf.to_file(gpkg, layer=f"admin{level}", driver="GPKG")
         else:
@@ -99,19 +102,19 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     if facilities is not None:
         facilities.to_file(gpkg, layer="facilities", driver="GPKG", mode="a")
         facilities.to_parquet(bundle_dir / "facilities.parquet")
-    admin2.to_parquet(bundle_dir / "admin2.parquet")
-    admin2.to_file(bundle_dir / "admin2.geojson", driver="GeoJSON")
+    admin2.to_parquet(bundle_dir / f"admin{stats_level}.parquet")
+    admin2.to_file(bundle_dir / f"admin{stats_level}.geojson", driver="GeoJSON")
 
-    _write_viewer(bundle_dir, profile, admin2)
+    _write_viewer(bundle_dir, profile, admin2, stats_level)
 
     population_total = float(results["population"].extra.get("total_population", float("nan")))
-    quality, passed = run_quality(profile.checks, admin | {2: admin2}, population_total)
+    quality, passed = run_quality(profile.checks, admin | {stats_level: admin2}, population_total)
     write_report(bundle_dir / "quality_report.json", quality, passed)
 
     output_files = {
         "cbk_baseline.gpkg": gpkg,
-        "admin2.parquet": bundle_dir / "admin2.parquet",
-        "admin2.geojson": bundle_dir / "admin2.geojson",
+        f"admin{stats_level}.parquet": bundle_dir / f"admin{stats_level}.parquet",
+        f"admin{stats_level}.geojson": bundle_dir / f"admin{stats_level}.geojson",
     }
     if facilities is not None:
         output_files["facilities.parquet"] = bundle_dir / "facilities.parquet"
@@ -119,6 +122,7 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     render_readme(bundle_dir, profile, manifest, {
         "population_total": population_total,
         "admin2_count": int(len(admin2)),
+        "stats_level": stats_level,
     })
 
     log.info("Bundle written to %s (quality gate: %s)", bundle_dir, "PASS" if passed else "FAIL")
@@ -171,7 +175,7 @@ def _viewer_index_src() -> Path | None:
     return cand if cand.is_file() else None
 
 
-def _write_viewer(bundle_dir: Path, profile, admin2: gpd.GeoDataFrame) -> None:
+def _write_viewer(bundle_dir: Path, profile, admin2: gpd.GeoDataFrame, stats_level: int) -> None:
     field = profile.viewer.get("choropleth_field", "population_sum")
     label = profile.viewer.get("choropleth_label", field)
     total = float(admin2["population_sum"].sum()) if "population_sum" in admin2 else 0.0
@@ -181,6 +185,7 @@ def _write_viewer(bundle_dir: Path, profile, admin2: gpd.GeoDataFrame) -> None:
         "date": bundle_dir.name,
         "field": field,
         "label": label,
+        "geojson": f"admin{stats_level}.geojson",
         "breaks": _quantile_breaks(admin2[field].tolist()) if field in admin2 else [],
         "colors": CHOROPLETH_COLORS,
         "total_population": total if math.isfinite(total) else 0.0,
