@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.3.0 — 2026-10-25
+
+Africa-wide coverage.
+
+- **54 country baselines** — every African country with buildable public
+  sources (all except Mauritius, whose COD-AB ships only image files):
+  OCHA COD-AB boundaries, WorldPop 2020 population, healthsites.io
+  facility counts, quality-gated and committed one country at a time.
+- **COD-AB adapter hardened against the real world**: tries ranked
+  resources until one yields admin levels (Lesotho's preview-only zip),
+  merges per-level resource packages via union fallback (Tanzania),
+  reads ESRI geodatabases and GeoPackage layers, demotes junk formats.
+- **Stats level generalized**: countries whose COD-AB stops at admin-1
+  (São Tomé, Western Sahara) build stats at their deepest level.
+- **Live map UI rebuilt**: searchable country sidebar with populations,
+  field switcher (population / density / facilities per 10k), 7-class
+  quantile ramp, hover highlighting, richer popups, keyless Esri light
+  basemap; CI builds countries in parallel and the site republishes
+  weekly.
+- **Quality gates pinned** per country from verified builds (admin-unit
+  counts) and UN-2020 population bands (±40%, justified exceptions like
+  South Sudan's census gap documented in-profile).
+- **Tools**: `probe_sources.py` (coverage audit), `gen_profiles.py`,
+  `pin_counts.py`, `zip_bundles.py`, commit-per-country `run_wave.sh`.
+
 ## 0.2.0 — 2026-10-25
 
 Second country and the first service layer.

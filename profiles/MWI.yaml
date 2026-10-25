@@ -5,7 +5,7 @@
 
 iso3: MWI
 name: Malawi
-profile_version: 0.2.0
+profile_version: 0.3.0
 
 # HDX dataset slug for OCHA administrative boundaries (COD-AB)
 hdx_slug: cod-ab-mwi
