@@ -204,6 +204,7 @@ class CodabAdapter(Adapter):
         extract_dir = ctx.raw_dir / "codab_extract"
         zip_path = None
         res = None
+        frames = None
         for res in resources:  # try candidates until one yields every level
             log.info("COD-AB %r: trying resource %r", pkg.get("title"), res.get("name"))
             zip_path, _digest = download(res["url"], ctx.raw_dir, session=session)
@@ -215,9 +216,17 @@ class CodabAdapter(Adapter):
                 log.warning("Resource %r unusable (%s); trying next", res.get("name"), exc)
                 frames = None
         if not frames:
-            raise RuntimeError(
-                f"No COD-AB resource in {pkg.get('name')!r} yielded admin levels {levels}"
-            )
+            # Union fallback: some packages ship one zip per admin level
+            # (e.g. Tanzania); no single resource yields every level. Pull
+            # all plausible resources into one extract and read per level.
+            log.info("No single resource yielded levels %s; trying union of all resources", levels)
+            for res2 in resources:
+                try:
+                    p, _ = download(res2["url"], ctx.raw_dir, session=session)
+                    _extract(p, extract_dir)
+                except Exception as exc:
+                    log.warning("Union: resource %r failed (%s)", res2.get("name"), exc)
+            frames = {lv: normalize_admin_columns(_read_level(extract_dir, lv), lv) for lv in levels}
 
         outputs: dict[str, Path] = {}
         feature_counts: dict[str, int] = {}
