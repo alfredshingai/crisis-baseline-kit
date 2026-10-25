@@ -25,6 +25,8 @@ layers:
     optional: true
 
 checks:
+  # As built 2026-10-25 (COD-AB feature count 79); +/-3 for minor source updates.
+  expected_admin2_count: [76, 82]
   # South Sudan has had no census since 2008; UN WPP 2020 says 11.2M but
   # uncertainty is very large. WorldPop unconstrained models 16.8M. Gate
   # spans the credible range rather than +/-40% of one estimate.
