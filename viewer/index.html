@@ -59,6 +59,7 @@ const FIELDS = [
   { key: "population_sum",     label: "Population",   fmt: v => fmt(v) },
   { key: "pop_density_km2",    label: "Density /km²", fmt: v => fmt(v) },
   { key: "facilities_per_10k_pop", label: "Facilities /10k", fmt: v => fmt(v, 1) },
+  { key: "road_km_per_100km2", label: "Roads /100km²", fmt: v => fmt(v, 1) },
 ];
 const fmt = (n, d = 0) => (n == null || Number.isNaN(Number(n))) ? "–" :
   Number(n).toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
