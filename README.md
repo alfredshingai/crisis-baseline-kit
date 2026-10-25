@@ -9,43 +9,55 @@
 > database — built entirely from public data, refreshed on a schedule,
 > with provenance for every row.
 
-![Malawi baseline viewer](docs/img/malawi-viewer.png)
+**Africa-wide coverage: 50+ country baselines built from OCHA boundaries,
+WorldPop population and healthsites.io facilities — see the
+[live map](https://alfredshingai.dev/crisis-baseline-kit/).**
 
-*The bundled map viewer showing the Malawi baseline: population per
-admin-2 unit (WorldPop 2020) over OCHA COD-AB boundaries, with health
-facility counts per district. Try the [live map](https://alfredshingai.dev/crisis-baseline-kit/).*
+![Live map — Angola](docs/img/angola-live-map.png)
 
-**Countries:** Malawi (MWI) · Mozambique (MOZ) — each one is a YAML profile.
+*The live map: population per admin unit (WorldPop 2020) over OCHA COD-AB
+boundaries, with health-facility coverage per district. Switch countries,
+fields, and click any unit for details.*
 
 ## The problem
 
 When a crisis hits, responders spend the first days assembling the same
-layers from a dozen inconsistent sources: boundaries, population, roads,
-facilities, exposure. That assembly work happens *during* the emergency,
-under time pressure, and is repeated by every organization independently.
+layers from a dozen inconsistent sources: boundaries, population, facilities.
+That assembly happens *during* the emergency, under time pressure, repeated
+by every organization independently.
 
 This kit makes it a finished, reproducible artifact **before** the
-emergency. One command produces a versioned baseline — and anyone can
-rebuild and verify it, because every layer carries its source URL,
-license, version and checksum.
-
-## Who it's for
-
-- **Humanitarian responders & preparedness teams** — a ready-made situational
-  baseline the moment something happens
-- **GIS / data staff at NGOs and UN agencies** — the standard layers,
-  harmonized, with p-codes, ready to join against your own data
-- **Researchers & students** — clean, documented, citable subnational data
-- **Open-data / OSM contributors** — a structure that turns public datasets
-  into operational products
+emergency — for an entire continent, not just countries that already had
+data teams.
 
 ## Get the data (no code needed)
 
-Ready-built bundles are published as
-[GitHub Releases](https://github.com/alfredshingai/crisis-baseline-kit/releases) —
-the [v0.1.0 Malawi baseline](https://github.com/alfredshingai/crisis-baseline-kit/releases/tag/v0.1.0)
-includes GeoPackage, GeoParquet and GeoJSON downloads plus a map viewer,
-quality report and full provenance manifest.
+- **Live map:** [alfredshingai.dev/crisis-baseline-kit](https://alfredshingai.dev/crisis-baseline-kit/)
+  — all countries, searchable sidebar, population / density / facility
+  fields.
+- **Downloads:** [Releases](https://github.com/alfredshingai/crisis-baseline-kit/releases)
+  carry full-resolution bundles per country: GeoPackage (all layers),
+  GeoParquet (analysis-ready admin table + facility points), GeoJSON,
+  provenance manifest, quality report, and the original raw source files.
+
+## Coverage
+
+Every African country is supported where sources allow. As of v0.3:
+
+- **Boundaries (COD-AB):** 54/54 countries available on HDX; built for all
+  but Mauritius (package ships only image files)
+- **Population (WorldPop 2020, 100 m):** 55/55 countries
+- **Health facilities (healthsites.io):** 52/55 countries (optional layer —
+  builds skip it where the dataset is missing)
+- **Admin depth:** admin-2 wherever the COD-AB has it (e.g. Nigeria's 774
+  LGAs, Kenya's 290 units); deepest available level otherwise (São Tomé,
+  Western Sahara at admin-1)
+
+Each country has a quality gate: expected admin-unit count (pinned from a
+verified build) and a population plausibility band (±40% of UN 2020
+estimates; widened with justification where sources genuinely disagree,
+e.g. South Sudan's post-2008-census uncertainty). **A build fails loudly
+rather than shipping wrong numbers.**
 
 ## Quickstart
 
@@ -53,8 +65,9 @@ quality report and full provenance manifest.
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e .
 
-cbk build MWI          # fetch sources, build the Malawi baseline bundle
-cbk serve MWI          # open the bundled map viewer (http://127.0.0.1:8000)
+cbk build MWI          # build any country: ISO3 from profiles/
+cbk build KEN --out baselines
+cbk serve MWI          # open the bundled map viewer locally
 cbk selftest           # synthetic end-to-end test, no network needed
 cbk adapters           # list available source adapters
 ```
@@ -63,22 +76,19 @@ cbk adapters           # list available source adapters
 
 ```
 baselines/MWI/2026-10-25/
-├── cbk_baseline.gpkg    # admin 0/1/2 boundaries; admin 2 carries the stats
-├── admin2.parquet       # admin-2 table (GeoParquet, analysis-ready)
-├── admin2.geojson       # same table, used by the viewer
+├── cbk_baseline.gpkg    # admin boundaries + facilities; stats level carries the joins
+├── admin2.parquet       # analysis-ready admin table (GeoParquet)
+├── admin2.geojson       # same table for map viewers
+├── facilities.parquet   # health facility points (separate ODbL table)
 ├── manifest.json        # per-layer source URL, license, version, SHA-256, timestamps
 ├── quality_report.json  # automated quality-gate results
-├── index.html           # MapLibre choropleth viewer (no tile server needed)
-├── README.md            # human-readable summary, auto-generated
-├── data/                # normalized per-layer outputs
+├── index.html           # bundled map viewer (no tile server needed)
 └── raw/                 # original downloads, checksummed
 ```
 
-Every admin-2 row ends up with `population_sum`, `area_km2` and
-`pop_density_km2` — the zonal-statistics join that turns a pile of
-downloads into a database. A build whose quality gate fails (unexpected
-admin-2 count, population total out of range, missing p-codes, ...) exits
-non-zero, so broken baselines cannot ship silently.
+Admin units carry `population_sum`, `area_km2`, `pop_density_km2`,
+`facility_count` and `facilities_per_10k_pop` — the zonal-statistics join
+that turns a pile of downloads into a database.
 
 ## How it works
 
@@ -86,49 +96,51 @@ non-zero, so broken baselines cannot ship silently.
 country profile (YAML) ──► adapters ──► pipeline ──► dated bundle + viewer
       MWI.yaml             codab        zonal stats    cbk_baseline.gpkg
                             worldpop    quality gate   manifest.json
-                                        provenance     quality_report.json
+                            healthsites provenance     quality_report.json
 ```
 
-- **Countries are YAML profiles** (`profiles/MWI.yaml`): sources, admin
-  levels, expected quality ranges, viewer styling. Adding a country
-  requires no code.
-- **Sources are adapters**: one small Python module per source
-  (`fetch → normalize → document provenance`). Everything downstream —
-  joins, statistics, manifest, viewer, quality gates — is shared.
-- **Quality gates block bad builds**: expectations live in the profile and
-  run on every build, locally and in CI.
-- **CI rebuilds continuously**: self-test on every PR; scheduled weekly
-  rebuilds keep baselines fresh as sources update.
+- **Countries are YAML profiles** — sources, admin levels, CRS, quality
+  gates, viewer styling. All 54 profiles ship in `profiles/`.
+- **Sources are adapters** — small modules that fetch, normalize, and
+  document provenance. They handle the real world: multi-resource COD-AB
+  packages, per-level zips, GeoPackages, ESRI geodatabases, EMF-only junk.
+- **Quality gates block bad builds** — locally and in CI.
+- **CI rebuilds weekly** — per-country parallel jobs, then the live map
+  republishes automatically.
+
+## Adding a data source
+
+One module in `src/cbk/adapters/` implementing `run(ctx, params) ->
+LayerResult` with complete provenance (license, URLs, version, retrieval
+time). See [CONTRIBUTING.md](CONTRIBUTING.md). Good next adapters: OSM
+roads/buildings (Geofabrik), schools (UNICEF × OSM), JRC surface water.
 
 ## Roadmap
 
-- ~~health facilities~~ ✓ v0.2 — `facility_count` & `facilities_per_10k_pop`
-  per district, from healthsites.io (ODbL, kept in a separate table)
-- ~~live map~~ ✓ v0.2 — [GitHub Pages site](https://alfredshingai.dev/crisis-baseline-kit/),
-  auto-published from the weekly CI rebuild
-- next — roads & buildings (OSM), schools; PMTiles output; bundle diffing
-  ("what changed since last month's baseline")
-- v0.3 — hazard layers (JRC surface water, Copernicus DEM) and simple
-  exposure scoring per admin unit
-- growth — more countries (each one is a YAML file), a cross-country
-  Parquet dataset for region-wide queries, cross-border regions
-  (e.g. the Zambezi basin shared by Malawi and Mozambique)
+- ~~health facilities~~ ✓ · ~~live map~~ ✓ · ~~Africa coverage~~ ✓ v0.3
+- next — roads & buildings (OSM), schools; PMTiles output for faster maps;
+  bundle diffing ("what changed since last month's baseline")
+- v0.4 — hazard layers (JRC surface water, Copernicus DEM) and exposure
+  scoring per admin unit (population in flood zones, distance to roads)
+- growth — cross-country Parquet dataset for region-wide queries;
+  cross-border basins (Zambezi, Lake Chad); other continents
 
 ## Contributing
 
-Issues and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Two great
-ways to start: **adopt a country** (write a profile, run it, fix what
-breaks) or **write an adapter** for a source you know. This project
-follows the [Contributor Covenant](CODE_OF_CONDUCT.md).
+Issues and PRs welcome — start with
+[CONTRIBUTING.md](CONTRIBUTING.md). Especially useful right now:
+adapter work (roads, schools), quality-check ideas, and testing builds
+for your own country. This project follows the
+[Contributor Covenant](CODE_OF_CONDUCT.md).
 
 ## Citation
 
-If the kit or its baselines help your work, please cite it — see
-[CITATION.cff](CITATION.cff) (GitHub exposes a "Cite this repository"
-button on the repo homepage).
+See [CITATION.cff](CITATION.cff) — GitHub shows a "Cite this repository"
+button on the repo homepage.
 
 ## License
 
 Code: MIT. Data: per-source licenses, recorded per layer in each bundle's
-`manifest.json` — see [docs/sources.md](docs/sources.md) for the full
-policy, including how ODbL (share-alike) OSM data will be handled from v0.2.
+`manifest.json` — WorldPop CC-BY 4.0, OCHA COD-AB CC BY-IGO, healthsites.io
+ODbL (kept in a separate table; see
+[docs/sources.md](docs/sources.md)).
