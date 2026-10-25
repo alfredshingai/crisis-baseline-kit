@@ -29,6 +29,11 @@ layers:
     adapter: healthsites
     optional: true
 
+  # Optional: skipped where no Geofabrik extract exists (ESH).
+  roads:
+    adapter: roads
+    optional: true
+
 # Quality gate: the build FAILS (non-zero exit) if any expectation is violated.
 checks:
   # Malawi COD-AB has 32 admin-2 units (28 districts + 4 cities); tolerate churn.

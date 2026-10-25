@@ -29,6 +29,11 @@ layers:
     adapter: healthsites
     optional: true
 
+  # Optional: skipped where no Geofabrik extract exists (ESH).
+  roads:
+    adapter: roads
+    optional: true
+
 checks:
   # Mozambique COD-AB admin-2 = districts; ~157-165 depending on vintage.
   expected_admin2_count: [148, 172]

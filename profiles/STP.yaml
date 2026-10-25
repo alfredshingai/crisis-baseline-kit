@@ -24,6 +24,11 @@ layers:
     adapter: healthsites
     optional: true
 
+  # Optional: skipped where no Geofabrik extract exists (ESH).
+  roads:
+    adapter: roads
+    optional: true
+
 checks:
   # As built (COD-AB stops at admin-1; 7 units); +/-3 for source updates.
   expected_admin2_count: [4, 10]

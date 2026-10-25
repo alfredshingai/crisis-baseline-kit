@@ -32,7 +32,7 @@ f = [l for l in m["layers"] if l["layer"] == "facilities"]
 print(f[0]["metadata"].get("facility_count", "-") if f else "-")
 EOF
 )
-    rm -f baselines/$iso/*/raw/*.tif baselines/$iso/*/raw/*.zip
+    rm -f baselines/$iso/*/raw/*.tif baselines/$iso/*/raw/*.zip baselines/$iso/*/raw/*.pbf
     rm -rf baselines/$iso/*/raw/codab_extract
     echo "$iso OK admin2=$n facilities=$fac" >> tools/build_status.txt
     "$PY" tools/pin_counts.py >/dev/null 2>&1 || true

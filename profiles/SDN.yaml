@@ -24,6 +24,11 @@ layers:
     adapter: healthsites
     optional: true
 
+  # Optional: skipped where no Geofabrik extract exists (ESH).
+  roads:
+    adapter: roads
+    optional: true
+
 checks:
   # As built 2026-10-25 (COD-AB feature count 189); +/-3 for minor source updates.
   expected_admin2_count: [186, 192]
