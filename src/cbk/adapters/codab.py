@@ -80,10 +80,10 @@ def _level_from_name(name: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
-def _extract(zip_path: Path, dest: Path) -> None:
-    if dest.exists():
+def _extract(zip_path: Path, dest: Path, clean: bool = True) -> None:
+    if clean and dest.exists():
         shutil.rmtree(dest)
-    dest.mkdir(parents=True)
+    dest.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(zip_path) as zf:
         zf.extractall(dest)
     # Some COD-ABs nest per-level zips one level down; unpack those too.
@@ -223,7 +223,7 @@ class CodabAdapter(Adapter):
             for res2 in resources:
                 try:
                     p, _ = download(res2["url"], ctx.raw_dir, session=session)
-                    _extract(p, extract_dir)
+                    _extract(p, extract_dir, clean=False)  # merge, don't wipe
                 except Exception as exc:
                     log.warning("Union: resource %r failed (%s)", res2.get("name"), exc)
             frames = {lv: normalize_admin_columns(_read_level(extract_dir, lv), lv) for lv in levels}
