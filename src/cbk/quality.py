@@ -62,6 +62,10 @@ def run_checks(
             total = int(gdf["facility_count"].sum())
             add("facilities_present", "FAIL" if total == 0 else "PASS",
                 f"{total} facilities joined to admin-{lvl} units")
+        if "road_km" in gdf.columns:
+            total_km = float(gdf["road_km"].sum())
+            add("roads_present", "FAIL" if total_km == 0 else "PASS",
+                f"{total_km:,.0f} km of major roads joined to admin-{lvl} units")
 
     if "expected_population_total_millions" in checks:
         lo, hi = checks["expected_population_total_millions"]

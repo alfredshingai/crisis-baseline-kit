@@ -88,9 +88,14 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     admin2 = zonal_sum(raster, admin[stats_level], key)
     admin2 = add_derived(admin2, profile.crs_analysis)
 
-    facilities = None
     if "facilities" in results:
         admin2, facilities = _join_facilities(admin2, results["facilities"])
+    else:
+        facilities = None
+
+    roads = None
+    if "roads" in results:
+        admin2, roads = _join_roads(admin2, results["roads"], profile.crs_analysis, key)
 
     gpkg = bundle_dir / "cbk_baseline.gpkg"
     for i, level in enumerate(sorted(admin)):
@@ -102,6 +107,9 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     if facilities is not None:
         facilities.to_file(gpkg, layer="facilities", driver="GPKG", mode="a")
         facilities.to_parquet(bundle_dir / "facilities.parquet")
+    if roads is not None:
+        roads.to_file(gpkg, layer="roads", driver="GPKG", mode="a")
+        roads.to_parquet(bundle_dir / "roads.parquet")
     admin2.to_parquet(bundle_dir / f"admin{stats_level}.parquet")
     admin2.to_file(bundle_dir / f"admin{stats_level}.geojson", driver="GeoJSON")
 
@@ -118,6 +126,8 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     }
     if facilities is not None:
         output_files["facilities.parquet"] = bundle_dir / "facilities.parquet"
+    if roads is not None:
+        output_files["roads.parquet"] = bundle_dir / "roads.parquet"
     manifest = build_manifest(profile, results, bundle_dir, quality, output_files=output_files)
     (bundle_dir / "meta.json").write_text(json.dumps({
         "iso3": profile.iso3,
@@ -163,6 +173,33 @@ def _join_facilities(admin2: gpd.GeoDataFrame, fac_result) -> tuple[gpd.GeoDataF
         len(fac), int((out["facility_count"] > 0).sum()), len(out),
     )
     return out, fac
+
+
+def _join_roads(admin2: gpd.GeoDataFrame, roads_result, crs_analysis: str, key: str):
+    """Attach road_km (major-road length per admin unit) via line-polygon overlay.
+
+    Road geometry stays a separate table (ODbL share-alike source); only
+    the aggregate length joins the admin table.
+    """
+    roads = gpd.read_file(roads_result.outputs["roads"], layer="roads")
+    if roads.crs is None:
+        roads = roads.set_crs("EPSG:4326")
+    roads = roads.to_crs(crs_analysis)
+    units = admin2[[key, "geometry"]].to_crs(crs_analysis)
+    inter = gpd.overlay(roads[["highway", "geometry"]], units, how="intersection")
+    km = (inter.groupby(key)["geometry"].apply(lambda s: s.length.sum() / 1000)
+          if len(inter) else None)
+    out = admin2.copy()
+    if km is not None:
+        out = out.merge(km.rename("road_km"), left_on=key, right_index=True, how="left")
+    else:
+        out["road_km"] = None
+    out["road_km"] = out["road_km"].astype("float64").round(2).fillna(0.0)
+    if "area_km2" in out.columns:
+        out["road_km_per_100km2"] = (out["road_km"] / out["area_km2"] * 100).round(2)
+    log.info("roads: %d segments, %.0f km total across %d admin units",
+             len(roads), float(out["road_km"].sum()), len(out))
+    return out, roads
 
 
 def _quantile_breaks(values, n: int = 5) -> list[float]:

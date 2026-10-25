@@ -311,7 +311,9 @@ fetch("countries.json").then(r => r.json()).then(cs => {
       if (p.population_sum != null) rows.push(["Population", fmt(p.population_sum)]);
       if (p.area_km2 != null) rows.push(["Area (km²)", fmt(p.area_km2)]);
       if (p.pop_density_km2 != null) rows.push(["Density (/km²)", fmt(p.pop_density_km2, 1)]);
-      if (p.facility_count != null)
+      if (p.road_km != null)
+  rows.push(["Major roads", `${fmt(p.road_km)} km`]);
+if (p.facility_count != null)
         rows.push(["Health facilities", `${fmt(p.facility_count)} (${fmt(p.facilities_per_10k_pop, 1)} per 10k)`]);
       new maplibregl.Popup({ maxWidth: "280px" })
         .setLngLat(e.lngLat)
