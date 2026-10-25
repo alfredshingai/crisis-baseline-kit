@@ -28,6 +28,9 @@ def main(argv=None) -> int:
     sub.add_parser("adapters", help="list available source adapters")
     sub.add_parser("selftest", help="run the synthetic end-to-end pipeline test (no network)")
 
+    p_diff = sub.add_parser("diff", help="diff the two latest bundles of a country")
+    p_diff.add_argument("country", help="ISO3 code (e.g. MWI) or path to a baselines/<ISO> dir")
+
     args = parser.parse_args(argv)
 
     if args.command == "build":
@@ -42,6 +45,22 @@ def main(argv=None) -> int:
 
     if args.command == "serve":
         return _serve(args.country, args.port)
+
+    if args.command == "diff":
+        from .diff import run as run_diff
+        from .util import setup_logging
+
+        setup_logging()
+        p = Path(args.country)
+        if p.is_dir() and p.parent.name in ("baselines", "."):
+            country_dir = p
+        else:
+            root = Path("baselines") / args.country.upper()
+            if not root.is_dir():
+                raise SystemExit(f"No bundles under {root}; run `cbk build` first")
+            country_dir = root
+        run_diff(country_dir)
+        return 0
 
     if args.command == "adapters":
         from .adapters import ADAPTERS
