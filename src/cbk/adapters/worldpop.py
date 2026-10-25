@@ -35,9 +35,12 @@ class WorldPopAdapter(Adapter):
             )
         tif, _digest = download(url, ctx.raw_dir, session=session)
 
+        # Block-wise sum: constant memory even for ~1 GB national rasters.
+        total = 0.0
         with rasterio.open(tif) as src:
-            arr = src.read(1, masked=True)
-            total = float(np.asarray(arr.sum(), dtype="float64"))
+            for _, window in src.block_windows(1):
+                arr = src.read(1, window=window, masked=True)
+                total += float(np.asarray(arr.sum(), dtype="float64"))
             meta = {
                 "width": src.width,
                 "height": src.height,

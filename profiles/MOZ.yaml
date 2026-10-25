@@ -27,6 +27,7 @@ layers:
 
   facilities:
     adapter: healthsites
+    optional: true
 
 checks:
   # Mozambique COD-AB admin-2 = districts; ~157-165 depending on vintage.

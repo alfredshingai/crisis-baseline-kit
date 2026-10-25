@@ -21,14 +21,27 @@ jobs:
       - run: python -m pip install -e .
       - run: cbk selftest
 
+  list-countries:
+    runs-on: ubuntu-latest
+    outputs:
+      countries: ${{ steps.list.outputs.countries }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          countries=$(python -c "import glob, json, os; print(json.dumps(sorted(os.path.basename(p)[:-5] for p in glob.glob('profiles/*.yaml'))))")
+          echo "countries=$countries" >> "$GITHUB_OUTPUT"
+
   build-baselines:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: list-countries
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
     strategy:
       fail-fast: false
+      max-parallel: 15
       matrix:
-        country: [MWI, MOZ]
+        country: ${{ fromJSON(needs.list-countries.outputs.countries) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,6 +53,6 @@ jobs:
       - run: cbk build ${{ matrix.country }} --out baselines
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.country }}-baseline
+          name: ${{ matrix.country }}
           path: baselines/${{ matrix.country }}/**
           if-no-files-found: error

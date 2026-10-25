@@ -27,6 +27,7 @@ layers:
 
   facilities:
     adapter: healthsites
+    optional: true
 
 # Quality gate: the build FAILS (non-zero exit) if any expectation is violated.
 checks:

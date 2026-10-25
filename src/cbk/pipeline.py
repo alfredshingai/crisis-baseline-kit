@@ -53,7 +53,13 @@ def build(country: str, out_root: Path, force: bool = False, date: str | None = 
     for layer_name, cfg in profile.layers.items():
         adapter_cls = ADAPTERS[cfg["adapter"]]
         log.info("Building layer %r with adapter %r", layer_name, cfg["adapter"])
-        results[layer_name] = adapter_cls().run(ctx, cfg.get("params") or {})
+        try:
+            results[layer_name] = adapter_cls().run(ctx, cfg.get("params") or {})
+        except Exception as exc:
+            if cfg.get("optional"):
+                log.warning("Optional layer %r failed (%s); skipping it", layer_name, exc)
+            else:
+                raise
 
     return assemble_bundle(profile, results, bundle_dir)
 

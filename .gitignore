@@ -21,3 +21,4 @@ Thumbs.db
 
 # Generated site output (built by CI, deployed to Pages)
 _site/
+tools/build_status.txt

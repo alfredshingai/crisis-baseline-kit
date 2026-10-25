@@ -1,0 +1,442 @@
+[
+  {
+    "iso3": "DZA",
+    "name": "Algeria",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 1246,
+    "healthsites": true
+  },
+  {
+    "iso3": "AGO",
+    "name": "Angola",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 674,
+    "healthsites": true
+  },
+  {
+    "iso3": "BEN",
+    "name": "Benin",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 63,
+    "healthsites": true
+  },
+  {
+    "iso3": "BWA",
+    "name": "Botswana",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 293,
+    "healthsites": true
+  },
+  {
+    "iso3": "BFA",
+    "name": "Burkina Faso",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 149,
+    "healthsites": true
+  },
+  {
+    "iso3": "BDI",
+    "name": "Burundi",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 14,
+    "healthsites": true
+  },
+  {
+    "iso3": "CMR",
+    "name": "Cameroon",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 252,
+    "healthsites": true
+  },
+  {
+    "iso3": "CPV",
+    "name": "Cabo Verde",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 3,
+    "healthsites": true
+  },
+  {
+    "iso3": "CAF",
+    "name": "Central African Republic",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 333,
+    "healthsites": true
+  },
+  {
+    "iso3": "TCD",
+    "name": "Chad",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 588,
+    "healthsites": true
+  },
+  {
+    "iso3": "COM",
+    "name": "Comoros",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 1,
+    "healthsites": true
+  },
+  {
+    "iso3": "COG",
+    "name": "Congo",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 176,
+    "healthsites": true
+  },
+  {
+    "iso3": "COD",
+    "name": "Democratic Republic of the Congo",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 1184,
+    "healthsites": true
+  },
+  {
+    "iso3": "CIV",
+    "name": "Cote d'Ivoire",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 168,
+    "healthsites": true
+  },
+  {
+    "iso3": "DJI",
+    "name": "Djibouti",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 12,
+    "healthsites": true
+  },
+  {
+    "iso3": "EGY",
+    "name": "Egypt",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 127,
+    "healthsites": true
+  },
+  {
+    "iso3": "GNQ",
+    "name": "Equatorial Guinea",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 17,
+    "healthsites": true
+  },
+  {
+    "iso3": "ERI",
+    "name": "Eritrea",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 69,
+    "healthsites": true
+  },
+  {
+    "iso3": "SWZ",
+    "name": "Eswatini",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 10,
+    "healthsites": false
+  },
+  {
+    "iso3": "ETH",
+    "name": "Ethiopia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 609,
+    "healthsites": true
+  },
+  {
+    "iso3": "GAB",
+    "name": "Gabon",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 139,
+    "healthsites": true
+  },
+  {
+    "iso3": "GMB",
+    "name": "Gambia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 6,
+    "healthsites": true
+  },
+  {
+    "iso3": "GHA",
+    "name": "Ghana",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 127,
+    "healthsites": true
+  },
+  {
+    "iso3": "GIN",
+    "name": "Guinea",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 136,
+    "healthsites": true
+  },
+  {
+    "iso3": "GNB",
+    "name": "Guinea-Bissau",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 18,
+    "healthsites": true
+  },
+  {
+    "iso3": "KEN",
+    "name": "Kenya",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 312,
+    "healthsites": true
+  },
+  {
+    "iso3": "LSO",
+    "name": "Lesotho",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 19,
+    "healthsites": true
+  },
+  {
+    "iso3": "LBR",
+    "name": "Liberia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 53,
+    "healthsites": true
+  },
+  {
+    "iso3": "LBY",
+    "name": "Libya",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 506,
+    "healthsites": true
+  },
+  {
+    "iso3": "MDG",
+    "name": "Madagascar",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 341,
+    "healthsites": true
+  },
+  {
+    "iso3": "MWI",
+    "name": "Malawi",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 55,
+    "healthsites": true
+  },
+  {
+    "iso3": "MLI",
+    "name": "Mali",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 628,
+    "healthsites": true
+  },
+  {
+    "iso3": "MRT",
+    "name": "Mauritania",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 519,
+    "healthsites": true
+  },
+  {
+    "iso3": "MUS",
+    "name": "Mauritius",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 9,
+    "healthsites": true
+  },
+  {
+    "iso3": "MAR",
+    "name": "Morocco",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 267,
+    "healthsites": true
+  },
+  {
+    "iso3": "MOZ",
+    "name": "Mozambique",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 447,
+    "healthsites": true
+  },
+  {
+    "iso3": "NAM",
+    "name": "Namibia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 491,
+    "healthsites": true
+  },
+  {
+    "iso3": "NER",
+    "name": "Niger",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 528,
+    "healthsites": true
+  },
+  {
+    "iso3": "NGA",
+    "name": "Nigeria",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 495,
+    "healthsites": true
+  },
+  {
+    "iso3": "RWA",
+    "name": "Rwanda",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 12,
+    "healthsites": true
+  },
+  {
+    "iso3": "STP",
+    "name": "Sao Tome and Principe",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 1,
+    "healthsites": false
+  },
+  {
+    "iso3": "SEN",
+    "name": "Senegal",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 105,
+    "healthsites": true
+  },
+  {
+    "iso3": "SYC",
+    "name": "Seychelles",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 6,
+    "healthsites": true
+  },
+  {
+    "iso3": "SLE",
+    "name": "Sierra Leone",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 40,
+    "healthsites": true
+  },
+  {
+    "iso3": "SOM",
+    "name": "Somalia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 337,
+    "healthsites": true
+  },
+  {
+    "iso3": "ZAF",
+    "name": "South Africa",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 747,
+    "healthsites": true
+  },
+  {
+    "iso3": "SSD",
+    "name": "South Sudan",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 319,
+    "healthsites": true
+  },
+  {
+    "iso3": "SDN",
+    "name": "Sudan",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 919,
+    "healthsites": true
+  },
+  {
+    "iso3": "TZA",
+    "name": "Tanzania",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 485,
+    "healthsites": true
+  },
+  {
+    "iso3": "TGO",
+    "name": "Togo",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 32,
+    "healthsites": true
+  },
+  {
+    "iso3": "TUN",
+    "name": "Tunisia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 95,
+    "healthsites": true
+  },
+  {
+    "iso3": "UGA",
+    "name": "Uganda",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 113,
+    "healthsites": true
+  },
+  {
+    "iso3": "ZMB",
+    "name": "Zambia",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 404,
+    "healthsites": true
+  },
+  {
+    "iso3": "ZWE",
+    "name": "Zimbabwe",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 217,
+    "healthsites": true
+  },
+  {
+    "iso3": "ESH",
+    "name": "Western Sahara",
+    "codab": true,
+    "worldpop": true,
+    "worldpop_mb": 120,
+    "healthsites": false
+  }
+]
