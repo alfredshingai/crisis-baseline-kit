@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.0 — 2026-10-31
+
+Roads everywhere, plus the change-detection primitive.
+
+- **Major-road network per admin unit** for 53 of 54 countries (km and
+  km/100km²), extracted from OpenStreetMap via Geofabrik country extracts
+  through GDAL's OSM driver — motorway through tertiary plus link classes.
+  OSM geometry stays in a separate ODbL table; only aggregates join the
+  admin data. Nigeria alone contributes 121,000 km across its 774 LGAs.
+- **`cbk diff`** — compares a country's two latest bundles and writes a
+  per-unit change report (`diff_report.json`); the weekly rebuilds now
+  accumulate comparable baselines.
+- **Map UIs**: roads-density field added to the live site and bundle
+  viewer popups.
+- **Adapter hardening**: Geofabrik slug corrections found the hard way
+  (Comoros publishes as `comores`, Eswatini as `swaziland`); download
+  retries with backoff survived several upstream connection-drop episodes
+  across the 53-country rebuild waves.
+- Western Sahara has no separate OSM extract (covered by Morocco's);
+  its roads layer is skipped by design.
+
 ## 0.3.0 — 2026-10-25
 
 Africa-wide coverage.

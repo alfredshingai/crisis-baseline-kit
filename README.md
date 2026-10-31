@@ -117,10 +117,11 @@ roads/buildings (Geofabrik), schools (UNICEF × OSM), JRC surface water.
 
 ## Roadmap
 
-- ~~health facilities~~ ✓ · ~~live map~~ ✓ · ~~Africa coverage~~ ✓ v0.3
-- next — roads & buildings (OSM), schools; PMTiles output for faster maps;
-  bundle diffing ("what changed since last month's baseline")
-- v0.4 — hazard layers (JRC surface water, Copernicus DEM) and exposure
+- ~~health facilities~~ ✓ · ~~live map~~ ✓ · ~~Africa coverage~~ ✓ v0.3 ·
+  ~~roads (OSM)~~ ✓ · ~~cbk diff~~ ✓ v0.4
+- next — schools (UNICEF × OSM); PMTiles output for faster maps; the
+  first scheduled `cbk diff` reports ("what changed this month")
+- v0.5 — hazard layers (JRC surface water, Copernicus DEM) and exposure
   scoring per admin unit (population in flood zones, distance to roads)
 - growth — cross-country Parquet dataset for region-wide queries;
   cross-border basins (Zambezi, Lake Chad); other continents
