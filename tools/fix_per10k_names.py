@@ -17,7 +17,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RENAMES = {"school_per_10k_pop": "schools_per_10k_pop",
-           "facility_per_10k_pop": "facilities_per_10k_pop"}
+           "facility_per_10k_pop": "facilities_per_10k_pop",
+           "facilitys_per_10k_pop": "facilities_per_10k_pop"}
 
 
 def latest_bundle(iso_dir: Path) -> Path | None:

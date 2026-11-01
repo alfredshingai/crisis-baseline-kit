@@ -159,13 +159,14 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     return bundle_dir
 
 
-def _join_point_counts(admin2: gpd.GeoDataFrame, result, kind: str, stat: str):
+def _join_point_counts(admin2: gpd.GeoDataFrame, result, kind: str, stat: str, per10k: str):
     """Count point features per admin unit (points-in-polygon spatial join).
 
     `kind` names the source table (e.g. "facilities"); `stat` names the
-    aggregate columns (e.g. "facility" -> facility_count,
-    facility_per_10k_pop). Point geometry stays a separate table (ODbL
-    share-alike sources); only the count aggregates join the admin table.
+    count column (e.g. "facility" -> facility_count); `per10k` names the
+    per-population column (e.g. "facilities" -> facilities_per_10k_pop).
+    Point geometry stays a separate table (ODbL share-alike sources);
+    only the count aggregates join the admin table.
     """
     pts = gpd.read_file(result.outputs[kind])
     if pts.crs is None:
@@ -176,7 +177,7 @@ def _join_point_counts(admin2: gpd.GeoDataFrame, result, kind: str, stat: str):
     counts = joined.groupby(key).size().rename(f"{stat}_count")
     out = admin2.merge(counts, left_on=key, right_index=True, how="left")
     out[f"{stat}_count"] = out[f"{stat}_count"].fillna(0).astype("int64")
-    out[f"{stat}s_per_10k_pop"] = (
+    out[f"{per10k}_per_10k_pop"] = (
         out[f"{stat}_count"] / out["population_sum"].where(out["population_sum"] > 0) * 10_000
     ).round(2)
     log.info(
@@ -187,11 +188,11 @@ def _join_point_counts(admin2: gpd.GeoDataFrame, result, kind: str, stat: str):
 
 
 def _join_facilities(admin2: gpd.GeoDataFrame, fac_result):
-    return _join_point_counts(admin2, fac_result, "facilities", "facility")
+    return _join_point_counts(admin2, fac_result, "facilities", "facility", "facilities")
 
 
 def _join_schools(admin2: gpd.GeoDataFrame, schools_result):
-    return _join_point_counts(admin2, schools_result, "schools", "school")
+    return _join_point_counts(admin2, schools_result, "schools", "school", "schools")
 
 
 def _join_roads(admin2: gpd.GeoDataFrame, roads_result, crs_analysis: str, key: str):
