@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0 — 2026-11-01
+
+Schools everywhere — and the first wave ever completed without retries.
+
+- **Schools layer for all 54 countries**: `school_count` and
+  `schools_per_10k_pop` per admin unit, from HOT's OSM
+  education-facilities extracts (ODbL; points in a separate table).
+  **354,577 schools** counted across the continent.
+- Facilities and schools share a generic point-count join — the next
+  point layer is a three-line addition.
+- Adapter hardening: CKAN envelope unwrap, zipped-GeoJSON resources,
+  and slug-variation fallbacks in the schools adapter (found via the
+  verification loop, covered by the synthetic self-test).
+- The 54-country rebuild wave completed without a single network
+  failure — the retry-with-backoff download layer has paid for itself.
+- Map UIs: schools-density field added to the live site and popups.
+
 ## 0.4.0 — 2026-10-31
 
 Roads everywhere, plus the change-detection primitive.
