@@ -176,7 +176,7 @@ def _join_point_counts(admin2: gpd.GeoDataFrame, result, kind: str, stat: str):
     counts = joined.groupby(key).size().rename(f"{stat}_count")
     out = admin2.merge(counts, left_on=key, right_index=True, how="left")
     out[f"{stat}_count"] = out[f"{stat}_count"].fillna(0).astype("int64")
-    out[f"{stat}_per_10k_pop"] = (
+    out[f"{stat}s_per_10k_pop"] = (
         out[f"{stat}_count"] / out["population_sum"].where(out["population_sum"] > 0) * 10_000
     ).round(2)
     log.info(

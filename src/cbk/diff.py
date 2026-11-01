@@ -15,7 +15,8 @@ import geopandas as gpd
 from .util import log
 
 STAT_FIELDS = ["population_sum", "pop_density_km2", "facility_count",
-               "facilities_per_10k_pop", "road_km", "area_km2"]
+               "facilities_per_10k_pop", "school_count", "schools_per_10k_pop",
+               "road_km", "area_km2"]
 
 
 def _latest_before(bundles: list[Path], ref: Path) -> Path | None:
