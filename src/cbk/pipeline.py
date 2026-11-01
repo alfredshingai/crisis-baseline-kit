@@ -97,6 +97,10 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     if "roads" in results:
         admin2, roads = _join_roads(admin2, results["roads"], profile.crs_analysis, key)
 
+    schools = None
+    if "schools" in results:
+        admin2, schools = _join_schools(admin2, results["schools"])
+
     gpkg = bundle_dir / "cbk_baseline.gpkg"
     for i, level in enumerate(sorted(admin)):
         layer_gdf = admin2 if level == stats_level else admin[level]
@@ -110,6 +114,9 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     if roads is not None:
         roads.to_file(gpkg, layer="roads", driver="GPKG", mode="a")
         roads.to_parquet(bundle_dir / "roads.parquet")
+    if schools is not None:
+        schools.to_file(gpkg, layer="schools", driver="GPKG", mode="a")
+        schools.to_parquet(bundle_dir / "schools.parquet")
     admin2.to_parquet(bundle_dir / f"admin{stats_level}.parquet")
     admin2.to_file(bundle_dir / f"admin{stats_level}.geojson", driver="GeoJSON")
 
@@ -128,6 +135,8 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
         output_files["facilities.parquet"] = bundle_dir / "facilities.parquet"
     if roads is not None:
         output_files["roads.parquet"] = bundle_dir / "roads.parquet"
+    if schools is not None:
+        output_files["schools.parquet"] = bundle_dir / "schools.parquet"
     manifest = build_manifest(profile, results, bundle_dir, quality, output_files=output_files)
     (bundle_dir / "meta.json").write_text(json.dumps({
         "iso3": profile.iso3,
@@ -150,29 +159,39 @@ def assemble_bundle(profile, results: dict, bundle_dir: Path) -> Path:
     return bundle_dir
 
 
-def _join_facilities(admin2: gpd.GeoDataFrame, fac_result) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
-    """Count facilities per admin-2 unit (points-in-polygon spatial join).
+def _join_point_counts(admin2: gpd.GeoDataFrame, result, kind: str, stat: str):
+    """Count point features per admin unit (points-in-polygon spatial join).
 
-    Facility points stay a separate table (ODbL share-alike source); only
-    the count aggregate is joined into the admin-2 table.
+    `kind` names the source table (e.g. "facilities"); `stat` names the
+    aggregate columns (e.g. "facility" -> facility_count,
+    facility_per_10k_pop). Point geometry stays a separate table (ODbL
+    share-alike sources); only the count aggregates join the admin table.
     """
-    fac = gpd.read_file(fac_result.outputs["facilities"])
-    if fac.crs is None:
-        fac = fac.set_crs("EPSG:4326")
-    fac = fac.to_crs(admin2.crs)
-    key = "adm2_pcode"
-    joined = gpd.sjoin(fac, admin2[[key, "geometry"]], predicate="within", how="inner")
-    counts = joined.groupby(key).size().rename("facility_count")
+    pts = gpd.read_file(result.outputs[kind])
+    if pts.crs is None:
+        pts = pts.set_crs("EPSG:4326")
+    key = "adm2_pcode" if "adm2_pcode" in admin2.columns else admin2.columns[0]
+    pts = pts.to_crs(admin2.crs)
+    joined = gpd.sjoin(pts, admin2[[key, "geometry"]], predicate="within", how="inner")
+    counts = joined.groupby(key).size().rename(f"{stat}_count")
     out = admin2.merge(counts, left_on=key, right_index=True, how="left")
-    out["facility_count"] = out["facility_count"].fillna(0).astype("int64")
-    out["facilities_per_10k_pop"] = (
-        out["facility_count"] / out["population_sum"].where(out["population_sum"] > 0) * 10_000
+    out[f"{stat}_count"] = out[f"{stat}_count"].fillna(0).astype("int64")
+    out[f"{stat}_per_10k_pop"] = (
+        out[f"{stat}_count"] / out["population_sum"].where(out["population_sum"] > 0) * 10_000
     ).round(2)
     log.info(
-        "facilities: %d points, %d of %d admin-2 units have at least one",
-        len(fac), int((out["facility_count"] > 0).sum()), len(out),
+        "%s: %d points, %d of %d admin units have at least one",
+        kind, len(pts), int((out[f"{stat}_count"] > 0).sum()), len(out),
     )
-    return out, fac
+    return out, pts
+
+
+def _join_facilities(admin2: gpd.GeoDataFrame, fac_result):
+    return _join_point_counts(admin2, fac_result, "facilities", "facility")
+
+
+def _join_schools(admin2: gpd.GeoDataFrame, schools_result):
+    return _join_point_counts(admin2, schools_result, "schools", "school")
 
 
 def _join_roads(admin2: gpd.GeoDataFrame, roads_result, crs_analysis: str, key: str):

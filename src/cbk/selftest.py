@@ -44,6 +44,9 @@ layers:
   roads:
     adapter: roads
     params: {}
+  schools:
+    adapter: schools
+    params: {}
 checks:
   expected_admin2_count: [4, 4]
   expected_population_total: [15000, 15500]
@@ -112,7 +115,13 @@ def _make_country(work: Path):
         "geometry": [LineString([(0, 2000), (4000, 2000)]),
                      LineString([(2000, 0), (2000, 4000)])],
     }, crs=crs)
-    return tif, 39 * 39 * 10.0, facilities, roads, {
+    schools = gpd.GeoDataFrame({
+        "school_name": [f"school {q}" for q in ("NW", "NE", "SW", "SE")],
+        "school_type": ["school"] * 4,
+        "geometry": [Point(1000, 3000), Point(3000, 3000),
+                     Point(1000, 1000), Point(3000, 1000)],
+    }, crs=crs)
+    return tif, 39 * 39 * 10.0, facilities, roads, schools, {
         "admin0": normalize_admin_columns(adm0, 0),
         "admin1": normalize_admin_columns(adm1, 1),
         "admin2": normalize_admin_columns(adm2, 2),
@@ -131,7 +140,7 @@ def run(keep: bool = False) -> bool:
         (bundle / "raw").mkdir(parents=True, exist_ok=True)
         data_dir.mkdir(parents=True, exist_ok=True)
 
-        tif, total, facilities, roads, frames = _make_country(work)
+        tif, total, facilities, roads, schools, frames = _make_country(work)
         outputs = {}
         for name, gdf in frames.items():
             p = data_dir / f"{name}.geojson"
@@ -141,6 +150,8 @@ def run(keep: bool = False) -> bool:
         facilities.to_file(fac_path, driver="GeoJSON")
         roads_path = data_dir / "roads.gpkg"
         roads.to_file(roads_path, layer="roads", driver="GPKG")
+        schools_path = data_dir / "schools.geojson"
+        schools.to_file(schools_path, driver="GeoJSON")
 
         results = {
             "admin_boundaries": LayerResult(
@@ -166,6 +177,14 @@ def run(keep: bool = False) -> bool:
                 outputs={"facilities": fac_path}, raw=[fac_path],
                 extra={"facility_count": 8},
             ),
+            "schools": LayerResult(
+                layer="schools", adapter="schools", kind="vector",
+                license="ODbL (test)", attribution="HOT OSM education (synthetic)",
+                source_urls=["https://example.org/tst-schools"], source_version="test-1",
+                retrieved_at="2000-01-01T00:00:00+00:00",
+                outputs={"schools": schools_path}, raw=[schools_path],
+                extra={"school_count": 4},
+            ),
             "roads": LayerResult(
                 layer="roads", adapter="roads", kind="vector",
                 license="ODbL (test)", attribution="OpenStreetMap contributors (synthetic)",
@@ -178,7 +197,7 @@ def run(keep: bool = False) -> bool:
         assemble_bundle(profile, results, bundle)
 
         expected = ["cbk_baseline.gpkg", "admin2.parquet", "admin2.geojson",
-                    "facilities.parquet", "roads.parquet", "manifest.json",
+                    "facilities.parquet", "roads.parquet", "schools.parquet", "manifest.json",
                     "quality_report.json", "README.md", "viewer_config.json"]
         missing = [f for f in expected if not (bundle / f).exists()]
         q = json.loads((bundle / "quality_report.json").read_text(encoding="utf-8"))
@@ -186,13 +205,15 @@ def run(keep: bool = False) -> bool:
         sums = sorted(a2["population_sum"].round(0).tolist())
         fac_counts = sorted(a2["facility_count"].tolist()) if "facility_count" in a2 else []
         road_kms = sorted(a2["road_km"].round(0).tolist()) if "road_km" in a2 else []
+        school_counts = sorted(a2["school_count"].tolist()) if "school_count" in a2 else []
         print(f"[cbk] selftest bundle: {bundle}")
         print(f"[cbk] admin-2 population sums: {sums} (expected 15210 total)")
         print(f"[cbk] admin-2 facility counts: {fac_counts} (expected 2 each)")
         print(f"[cbk] admin-2 road km: {road_kms} (expected [4, 4, 4, 4])")
+        print(f"[cbk] admin-2 school counts: {school_counts} (expected [1, 1, 1, 1])")
 
         ok = (not missing) and q["passed"] and len(a2) == 4 and all(s > 0 for s in sums) \
-            and fac_counts == [2, 2, 2, 2] and road_kms == [4.0, 4.0, 4.0, 4.0]
+            and fac_counts == [2, 2, 2, 2] and road_kms == [4.0, 4.0, 4.0, 4.0]             and school_counts == [1, 1, 1, 1]
         detail = f" (missing files: {missing})" if missing else ""
         print(f"[cbk] selftest: {'PASS' if ok else 'FAIL'}{detail}")
         return ok

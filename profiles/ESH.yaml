@@ -29,6 +29,10 @@ layers:
     adapter: roads
     optional: true
 
+  schools:
+    adapter: schools
+    optional: true
+
 checks:
   # As built (COD-AB stops at admin-1; 4 units); +/-3 for source updates.
   expected_admin2_count: [1, 7]

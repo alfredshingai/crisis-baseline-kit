@@ -1,0 +1,827 @@
+[
+  {
+    "iso3": "DZA",
+    "found": true,
+    "slug": "hotosm_dza_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "AGO",
+    "found": true,
+    "slug": "hotosm_ago_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "BEN",
+    "found": true,
+    "slug": "hotosm_ben_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "BWA",
+    "found": true,
+    "slug": "hotosm_bwa_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "BFA",
+    "found": true,
+    "slug": "hotosm_bfa_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "BDI",
+    "found": true,
+    "slug": "hotosm_bdi_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "CMR",
+    "found": true,
+    "slug": "hotosm_cmr_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "CPV",
+    "found": true,
+    "slug": "hotosm_cpv_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "CAF",
+    "found": true,
+    "slug": "hotosm_caf_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "TCD",
+    "found": true,
+    "slug": "hotosm_tcd_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "COM",
+    "found": true,
+    "slug": "hotosm_com_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "COG",
+    "found": true,
+    "slug": "hotosm_cog_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "COD",
+    "found": true,
+    "slug": "hotosm_cod_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "CIV",
+    "found": true,
+    "slug": "hotosm_civ_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "DJI",
+    "found": true,
+    "slug": "hotosm_dji_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "EGY",
+    "found": true,
+    "slug": "hotosm_egy_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "GNQ",
+    "found": true,
+    "slug": "hotosm_gnq_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "ERI",
+    "found": true,
+    "slug": "hotosm_eri_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SWZ",
+    "found": true,
+    "slug": "hotosm_swz_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "ETH",
+    "found": true,
+    "slug": "hotosm_eth_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "GAB",
+    "found": true,
+    "slug": "hotosm_gab_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "GMB",
+    "found": true,
+    "slug": "hotosm_gmb_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "GHA",
+    "found": true,
+    "slug": "hotosm_gha_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "GIN",
+    "found": true,
+    "slug": "hotosm_gin_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "GNB",
+    "found": true,
+    "slug": "hotosm_gnb_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "KEN",
+    "found": true,
+    "slug": "hotosm_ken_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "LSO",
+    "found": true,
+    "slug": "hotosm_lso_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "LBR",
+    "found": true,
+    "slug": "hotosm_lbr_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "LBY",
+    "found": true,
+    "slug": "hotosm_lby_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MDG",
+    "found": true,
+    "slug": "hotosm_mdg_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MWI",
+    "found": true,
+    "slug": "hotosm_mwi_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MLI",
+    "found": true,
+    "slug": "hotosm_mli_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MRT",
+    "found": true,
+    "slug": "hotosm_mrt_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MUS",
+    "found": true,
+    "slug": "hotosm_mus_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MAR",
+    "found": true,
+    "slug": "hotosm_mar_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "MOZ",
+    "found": true,
+    "slug": "hotosm_moz_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "NAM",
+    "found": true,
+    "slug": "hotosm_nam_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "NER",
+    "found": true,
+    "slug": "hotosm_ner_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "NGA",
+    "found": true,
+    "slug": "hotosm_nga_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "RWA",
+    "found": true,
+    "slug": "hotosm_rwa_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "STP",
+    "found": true,
+    "slug": "hotosm_stp_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SEN",
+    "found": true,
+    "slug": "hotosm_sen_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SYC",
+    "found": true,
+    "slug": "hotosm_syc_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SLE",
+    "found": true,
+    "slug": "hotosm_sle_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SOM",
+    "found": true,
+    "slug": "hotosm_som_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "ZAF",
+    "found": true,
+    "slug": "hotosm_zaf_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SSD",
+    "found": true,
+    "slug": "hotosm_ssd_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "SDN",
+    "found": true,
+    "slug": "hotosm_sdn_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "TZA",
+    "found": true,
+    "slug": "hotosm_tza_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "TGO",
+    "found": true,
+    "slug": "hotosm_tgo_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "TUN",
+    "found": true,
+    "slug": "hotosm_tun_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "UGA",
+    "found": true,
+    "slug": "hotosm_uga_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "ZMB",
+    "found": true,
+    "slug": "hotosm_zmb_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "ZWE",
+    "found": true,
+    "slug": "hotosm_zwe_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  },
+  {
+    "iso3": "ESH",
+    "found": true,
+    "slug": "hotosm_esh_education_facilities",
+    "formats": [
+      "geojson",
+      "geopackage",
+      "geoparquet",
+      "html",
+      "json",
+      "kml",
+      "pmtiles",
+      "shp"
+    ]
+  }
+]

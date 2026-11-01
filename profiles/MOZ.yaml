@@ -34,6 +34,10 @@ layers:
     adapter: roads
     optional: true
 
+  schools:
+    adapter: schools
+    optional: true
+
 checks:
   # Mozambique COD-AB admin-2 = districts; ~157-165 depending on vintage.
   expected_admin2_count: [148, 172]
